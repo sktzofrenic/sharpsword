@@ -1,0 +1,7 @@
+<div class="version vid1 iso6393eng" data-vid="1" data-iso6393="eng">
+    <div class="book bkPSA">
+        <div class="chapter ch117" data-usfm="PSA.117">
+            <div class="label">117</div><div class="q1"><span class="content">  </span><span class="verse v1" data-usfm="PSA.117.1"><span class="label">1</span><span class="content">O praise the </span><span class="nd"><span class="content">LORD</span></span><span class="content">,</span></span></div><div class="q2"><span class="verse v1" data-usfm="PSA.117.1"><span class="content">All ye nations: Praise him, all ye people.</span></span></div><div class="q1"><span class="verse v1" data-usfm="PSA.117.1"><span class="content">  </span></span><span class="verse v2" data-usfm="PSA.117.2"><span class="label">2</span><span class="content">For his merciful kindness is great toward us:</span></span></div><div class="q2"><span class="verse v2" data-usfm="PSA.117.2"><span class="content">And the truth of the </span><span class="nd"><span class="content">LORD</span></span><span class="content">  </span><span class="add"><span class="content">endureth</span></span><span class="content"> for ever.</span></span></div><div class="qr"><span class="verse v2" data-usfm="PSA.117.2"><span class="content">Praise ye the </span><span class="nd"><span class="content">LORD</span></span><span class="content">.</span></span></div><div class="b"></div>
+        </div>
+    </div>
+</div>
