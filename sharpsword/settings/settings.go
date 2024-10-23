@@ -5,6 +5,14 @@ import (
     "github.com/joho/godotenv"
 )
 
+func getEnv(key, fallback string) string {
+    value, exists := os.LookupEnv(key)
+    if !exists {
+        value = fallback
+    }
+    return value
+}
+
 type Settings struct {
     Port string
 }
@@ -17,7 +25,7 @@ func GetSettings() Settings {
     }
 
     return Settings{
-        Port: os.Getenv("PORT"),
+        Port: getEnv("PORT", "3000"),
     }
 }
 
