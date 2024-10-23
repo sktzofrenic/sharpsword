@@ -5,13 +5,9 @@ import (
     "github.com/joho/godotenv"
 )
 
-// provide exportable struct with environment variables
-
 type Settings struct {
     Port string
 }
-
-// provide function to get environment variables
 
 func GetSettings() Settings {
     err := godotenv.Load()
