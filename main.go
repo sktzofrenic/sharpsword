@@ -5,8 +5,8 @@ import (
     "log"
     "github.com/gofiber/fiber/v3"
     "github.com/gofiber/fiber/v3/middleware/static"
-    "sharpsword/sharpsword/api/bible"
-    "sharpsword/sharpsword/settings"
+    "sharpsword/sharpeners/api/bible"
+    "sharpsword/sharpeners/settings"
 )
 
 func main() {
