@@ -1,5 +1,6 @@
 venv/
 venv3/
+tmp/
 __pycache__/
 node_modules/
 .cache
