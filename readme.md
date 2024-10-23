@@ -2,6 +2,10 @@
 
 SharpSword is a Bible web app written in Go/Vue with a focus of fast search and navigation. 
 
+Live Implementation: [https://sharpsword.io](https://sharpsword.io)
+
+*The goal is to host this application free forever.* Please consider supporting the project by [donating](https://venmo.com/DanSafee).
+
 ## Goals
 
 - Fast search with results returned with each keystroke
