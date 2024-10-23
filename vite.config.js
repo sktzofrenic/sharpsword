@@ -21,6 +21,6 @@ export default defineConfig({
                 entryFileNames: 'assets/[name].js'
             },
         },
-        outDir: 'public/build/'
+        outDir: 'public/'
     }
 })

@@ -12,11 +12,12 @@ import (
 func main() {
     app := fiber.New()
 
-    app.Get("/public/*", static.New(("./public")))
+    app.Get("/*", static.New(("./public")))
 
     bible.Register(app)
 
     app.Get("/", func(c fiber.Ctx) error {
+
         return c.SendString("Hello, World 👋!")
     })
 
