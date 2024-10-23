@@ -1,10 +1,12 @@
 package main
 
 import (
+    "fmt"
     "log"
     "github.com/gofiber/fiber/v3"
     "github.com/gofiber/fiber/v3/middleware/static"
     "sharpsword/sharpsword/api/bible"
+    "sharpsword/sharpsword/settings"
 )
 
 func main() {
@@ -18,5 +20,8 @@ func main() {
         return c.SendString("Hello, World 👋!")
     })
 
-    log.Fatal(app.Listen(":3000"))
+    settings := settings.GetSettings()
+    fmt.Println("Server is running on port " + settings.Port)
+
+    log.Fatal(app.Listen(":" + settings.Port))
 }
