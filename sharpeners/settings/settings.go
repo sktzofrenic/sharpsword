@@ -3,6 +3,7 @@ package settings
 import (
     "os"
     "github.com/joho/godotenv"
+    "log"
 )
 
 func getEnv(key, fallback string) string {
@@ -21,7 +22,7 @@ func GetSettings() Settings {
     err := godotenv.Load()
 
     if err != nil {
-        panic(err)
+        log.Fatal("Error loading .env file")
     }
 
     return Settings{
