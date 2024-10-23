@@ -8,7 +8,7 @@ SharpSword is a Bible web app written in Go/Vue with a focus of fast search and 
 - Fast navigation using keyboard to any book/chapter/verse
 - Mobile first Progressive Web App (PWA) design with responsive layout for desktop
 - Amazing Copy/Paste support with customizable formatting
-- Verse highlighting and note taking
+- Verse highlighting and verse selections with sharing options
 - Data export and import for easy transition to self hosting
 
 ![SharpSword](./logo/sword_zoom_sq_512.png)
