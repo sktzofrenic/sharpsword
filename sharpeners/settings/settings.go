@@ -22,7 +22,7 @@ func GetSettings() Settings {
     err := godotenv.Load()
 
     if err != nil {
-        log.Fatal("Error loading .env file")
+        log.Print("No .env file found, using default values")
     }
 
     return Settings{
