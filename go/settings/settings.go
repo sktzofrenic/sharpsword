@@ -16,6 +16,7 @@ func getEnv(key, fallback string) string {
 
 type Settings struct {
     Port string
+    DatabaseURL string
 }
 
 func GetSettings() Settings {
@@ -27,6 +28,7 @@ func GetSettings() Settings {
 
     return Settings{
         Port: getEnv("PORT", "3000"),
+        DatabaseURL: getEnv("DATABASE_URL", "localhost"),
     }
 }
 
