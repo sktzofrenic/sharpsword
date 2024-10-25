@@ -31,14 +31,14 @@
             <div class="mx-auto max-w-7xl px-6 py-6 sm:px-6 lg:px-8 text-slate-100 pb-40">
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
-                        {{ activeBook }}
+                        {{ book }}
                     </div>
                     <div class="font-bold text-6xl mb-8">
-                        {{ activeChapter }}
+                        {{ chapter }}
                     </div>
                 </div>
                 <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto">
-                    <Verse v-for="verse in verses" :key="verse.n" :verse="verse" />
+                    <Verse v-for="(verse, index) in verses" :key="verse.verse_id" :verse="verse" :index=index />
                     <div class="flex justify-center mt-6">
                         <button class="text-slate-600 italic text-sm">
                             KJV text in the public domain.
@@ -51,11 +51,15 @@
         <footer class="bg-slate-950 fixed w-full bottom-0 border-slate-600 border-t">
             <div class="mx-auto max-w-7xl px-4 text-slate-200 flex items-center justify-center">
                 <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
-                    <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
-                    <span class="font-bold py-1">
-                        {{ activeBook }} {{ activeChapter }}
+                    <span class="pointer" @click="changeChapter(prevChapter)">
+                        <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
                     </span>
-                    <i class="fa-solid fa-right text-xl px-4 text-slate-500"></i>
+                    <span class="font-bold py-1">
+                        {{ book }} {{ chapter }}
+                    </span>
+                    <span class="pointer" @click="changeChapter(nextChapter)">
+                        <i class="fa-solid fa-right text-xl px-4 text-slate-500"></i>
+                    </span>
                 </div>
             </div>
             <div class="mx-auto max-w-7xl px-8 pb-2">
@@ -93,27 +97,44 @@ const baseUrl = useBaseUrlStore()
 
 const chapter = ref(1)
 const book = ref('')
+const bookId = ref(57)
 const verses = ref([])
 
-const activeBook = computed(() => {
-    // find all unique books in verses
-    const books = verses.value.map(verse => verse.B)
-    return [...new Set(books)].join(' - ')
-})
+const prevChapter = ref({})
+const nextChapter = ref({})
 
-const activeChapter = computed(() => {
-    // find all unique books in verses
-    const chapters = verses.value.map(verse => verse.C)
-    return [...new Set(chapters)].join(' - ')
-})
+
+const changeChapter = (reference) => {
+    bookId.value = reference.bookId
+    chapter.value = reference.chapter
+    getVerses()
+}
 
 const getVerses = async () => {
     try {
-        const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/30/1`)
-        if (response.data.v === null) {
+        const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/${bookId.value}/${chapter.value}`)
+        if (response.data.v === null || response.data.v.length === 0) {
             return
         }
+
+        var prev = response.data.v[0]
+        prevChapter.value = {
+            bookId: prev.BID,
+            chapter: prev.C
+        }
+        var next = response.data.v[response.data.v.length - 1]
+        nextChapter.value = {
+            bookId: next.BID,
+            chapter: next.C
+        }
+
+        response.data.v.shift()
+        response.data.v.pop()
+
         verses.value = response.data.v
+        bookId.value = response.data.v[0].BID
+        book.value = response.data.v[0].B
+        chapter.value = response.data.v[0].C
     } catch (error) {
         console.error(error)
     }
