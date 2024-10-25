@@ -48,6 +48,7 @@ func Register(app *fiber.App) {
             books.book_name as book,
             verses.verse_id,
             coalesce(paragraphs.verse_id, 0) as paragraph,
+            coalesce(descriptions.description_plain, '') as description,
             chapter
         FROM verses
             left join books on verses.book = books.book_id
@@ -70,6 +71,7 @@ func Register(app *fiber.App) {
                 &row.B,
                 &row.ID,
                 &row.P,
+                &row.D,
                 &row.C,
             )
             if err != nil {
