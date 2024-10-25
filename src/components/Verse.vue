@@ -3,17 +3,19 @@
         {{ verse.D }}
     </div>
     <div class="verse-container" v-html="verse.T"></div>
-    <div v-if="verse.H" class="mt-4 -mb-6">
+    <div v-if="verse.H" class="mt-4">
         <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
     </div>
-    <span v-if="verse.P" class="text-slate-800 -mb-[30px] mt-[20px]" >¶</span>
+    <span v-if="verse.P && index > 0" class="text-slate-800 -mb-[30px] mt-[20px] ml-3" >¶</span>
 </template>
 
 <script setup>
 import { ref, defineProps } from 'vue'
 
 const props = defineProps({
-    verse: Object
+    verse: Object,
+    key: Number,
+    index: Number
 })
 
 </script>
@@ -36,7 +38,9 @@ const props = defineProps({
     font-style: italic;
     margin-left: -0.8em;
 }
-.verse-container {
+.verse-container :deep(.verse) {
+    display:block;
+    margin-left: 0.8em;
 }
 
 
