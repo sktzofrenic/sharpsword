@@ -52,13 +52,13 @@
         <footer class="bg-slate-950 fixed w-full bottom-0 border-slate-600 border-t">
             <div class="mx-auto max-w-7xl px-4 text-slate-200 flex items-center justify-center">
                 <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
-                    <span class="pointer" @click="changeChapter(prevChapter)">
+                    <span class="cursor-pointer" @click="changeChapter(prevChapter)">
                         <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
                     </span>
                     <span class="font-bold py-1">
                         {{ book }} {{ chapter }}
                     </span>
-                    <span class="pointer" @click="changeChapter(nextChapter)">
+                    <span class="cursor-pointer" @click="changeChapter(nextChapter)">
                         <i class="fa-solid fa-right text-xl px-4 text-slate-500"></i>
                     </span>
                 </div>
