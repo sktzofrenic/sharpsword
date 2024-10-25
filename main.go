@@ -16,12 +16,7 @@ func main() {
 
     app.Get("/*", static.New(("./public")))
 
-    bible.Register(app, settings.DatabaseURL)
-
-    app.Get("/", func(c fiber.Ctx) error {
-
-        return c.SendString("Hello, World 👋!")
-    })
+    bible.Register(app)
 
     fmt.Println("Server is running on port " + settings.Port)
 
