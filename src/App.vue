@@ -28,7 +28,7 @@
             </div>
         </nav>
         <main>
-            <div class="mx-auto max-w-7xl px-6 py-6 sm:px-6 lg:px-8 text-slate-100 pb-40">
+            <div  class="mx-auto max-w-7xl px-6 py-6 sm:px-6 lg:px-8 text-slate-100 pb-40" style="height: 100vh; overflow-y: auto" ref="versesContainer">
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
                         {{ book }}
@@ -37,9 +37,9 @@
                         {{ chapter }}
                     </div>
                 </div>
-                <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto">
+                <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto" >
                     <Verse v-for="(verse, index) in verses" :key="verse.verse_id" :verse="verse" :index=index />
-                    <div class="flex justify-center mt-6">
+                    <div class="flex justify-center mb-24 mt-8">
                         <button class="text-slate-600 italic text-sm">
                             KJV text in the public domain.
                         </button>
@@ -99,6 +99,7 @@ const chapter = ref(1)
 const book = ref('')
 const bookId = ref(1)
 const verses = ref([])
+const versesContainer = ref(null)
 
 const prevChapter = ref({})
 const nextChapter = ref({})
@@ -135,6 +136,10 @@ const getVerses = async () => {
         bookId.value = response.data.v[0].BID
         book.value = response.data.v[0].B
         chapter.value = response.data.v[0].C
+        // scroll to top of verses container
+        console.log(versesContainer.value)
+        versesContainer.value.scrollTop = 0
+
     } catch (error) {
         console.error(error)
     }
@@ -146,3 +151,5 @@ onMounted(() => {
 
 
 </script>
+<style scoped>
+</style>
