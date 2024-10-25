@@ -1,5 +1,6 @@
 
 <template>
+    <!-- <VersePicker /> -->
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4">
@@ -28,7 +29,7 @@
             </div>
         </nav>
         <main>
-            <div  class="mx-auto max-w-7xl px-6 py-6 sm:px-6 lg:px-8 text-slate-100 pb-40" style="height: 100vh; overflow-y: auto" ref="versesContainer">
+            <div  class="mx-auto max-w-7xl px-6  text-slate-100 pb-40 -mt-10 pt-20" style="height: 100vh; overflow-y: auto" ref="versesContainer">
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
                         {{ book }}
@@ -89,6 +90,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Verse from '@/components/Verse.vue'
+import VersePicker from '@/components/VersePicker.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
@@ -137,7 +139,6 @@ const getVerses = async () => {
         book.value = response.data.v[0].B
         chapter.value = response.data.v[0].C
         // scroll to top of verses container
-        console.log(versesContainer.value)
         versesContainer.value.scrollTop = 0
 
     } catch (error) {

@@ -6,8 +6,47 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://kit.fontawesome.com/d160a97011.js" crossorigin="anonymous"></script>
         <title>SharpSword</title>
+        <style>
+        /* Firefox (uncomment to work in Firefox, although other properties will not work!)  */
+        /** {
+        scrollbar-width: thin;
+        scrollbar-color: #20263B #020617;
+        }*/
+
+        /* Chrome, Edge and Safari */
+        *::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+        }
+        *::-webkit-scrollbar-track {
+        border-radius: 5px;
+        background-color: #020617;
+        }
+
+        *::-webkit-scrollbar-track:hover {
+        background-color: #020617;
+        }
+
+        *::-webkit-scrollbar-track:active {
+        background-color: #020617;
+        }
+
+        *::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: #20263B;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+        background-color: #020617;
+        }
+
+        *::-webkit-scrollbar-thumb:active {
+        background-color: #020617;
+        }
+
+        </style>
     </head>
-    <body class="h-full">
+    <body class="h-screen overflow-hidden">
         <div id="app"></div>
         <script type="module" src="/src/main.js"></script>
     </body>
