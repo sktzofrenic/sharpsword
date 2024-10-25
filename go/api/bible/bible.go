@@ -45,7 +45,7 @@ func Register(app *fiber.App) {
             left join headings on verses.verse_id = headings.verse_id and headings.version = $1
             left join paragraphs on verses.verse_id = paragraphs.verse_id and paragraphs.version = $1
         WHERE verses.version = $1 
-        AND verses.verse_id >= (SELECT max(verses.verse_id) FROM verses WHERE version = $1 and verse_id < $2 - 1)
+        AND verses.verse_id >= (SELECT coalesce(max(verses.verse_id), 0) FROM verses WHERE version = $1 and verse_id < $2 - 1)
         AND verses.verse_id <= (SELECT min(verses.verse_id) FROM verses WHERE version = $1 and verse_id > $2 + 999)
         ORDER BY verses.verse_id ASC;
         `
