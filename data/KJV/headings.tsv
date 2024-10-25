@@ -1,4 +1,6 @@
 verse_id	version	heading_plain
+11015024	KJV	Israel and Nadab
+18003001	KJV	The Debate - Job's Outburst
 43003001	KJV	Nicodemus
 1003001	KJV	The Fall
 1004001	KJV	Cain and Abel
@@ -307,8 +309,6 @@ verse_id	version	heading_plain
 11014020	KJV	Rehoboam
 11015001	KJV	Abijam
 11015008	KJV	Asa
-11015024	KJV	Israel
-11015024	KJV	Nadab
 11015026	KJV	Baasha
 11016001	KJV	Jehu
 11016007	KJV	Civil War in Israel
@@ -505,8 +505,6 @@ verse_id	version	heading_plain
 18001005	KJV	Job's Character
 18001012	KJV	His Afflictions
 18002010	KJV	His Friends
-18003001	KJV	The Debate
-18003001	KJV	Job's Outburst
 18004001	KJV	Eliphaz Speaks
 18006001	KJV	Job's Answer
 18008001	KJV	Bildad's Speech
@@ -571,8 +569,6 @@ verse_id	version	heading_plain
 19025018	KJV	ר Resh
 19025019	KJV	ש Shin
 19025020	KJV	ת Taw
-19034001	KJV	א Aleph
-19034001	KJV	ב Bet
 19034002	KJV	ג Gimel
 19034003	KJV	ד Dalet
 19034004	KJV	ה He
@@ -619,40 +615,23 @@ verse_id	version	heading_plain
 19111001	KJV	ג Gimel
 19111002	KJV	ד Dalet
 19111002	KJV	ה He
-19111003	KJV	ו Waw
-19111003	KJV	ז Zain
 19111004	KJV	ח Het
 19111004	KJV	ט Tet
 19111005	KJV	י Yod
 19111005	KJV	כ Kaph
-19111006	KJV	ל Lamed
-19111006	KJV	מ Mem
-19111007	KJV	נ Nun
-19111007	KJV	ס Samek
 19111008	KJV	ע Ain
 19111008	KJV	פ Pe
-19111009	KJV	צ Zade
-19111009	KJV	ק Qoph
-19111009	KJV	ר Resh
 19111010	KJV	ש Shin
 19111010	KJV	ת Taw
 19112001	KJV	א Aleph
 19112001	KJV	ב Bet
 19112001	KJV	ג Gimel
-19112002	KJV	ד Dalet
-19112002	KJV	ה He
 19112003	KJV	ו Waw
 19112003	KJV	ז Zain
-19112004	KJV	ח Het
-19112004	KJV	ט Tet
-19112005	KJV	י Yod
-19112005	KJV	כ Kaph
 19112006	KJV	ל Lamed
 19112006	KJV	מ Mem
 19112007	KJV	נ Nun
 19112007	KJV	ס Samek
-19112008	KJV	ע Ain
-19112008	KJV	פ Pe
 19112009	KJV	צ Zade
 19112009	KJV	ק Qoph
 19112009	KJV	ר Resh
@@ -675,8 +654,6 @@ verse_id	version	heading_plain
 19119152	KJV	ר Resh
 19119160	KJV	ש Shin
 19119168	KJV	ת Taw
-19145001	KJV	א Aleph
-19145001	KJV	ב Bet
 19145002	KJV	ג Gimel
 19145003	KJV	ד Dalet
 19145004	KJV	ה He
@@ -798,7 +775,6 @@ verse_id	version	heading_plain
 24024001	KJV	Parable of the Figs
 24025001	KJV	The Fall of Judah
 24025014	KJV	The Doom of the Nations
-24026001	KJV	Events in the Life of the Prophet
 24026001	KJV	Attacked in the Temple
 24027001	KJV	A Yoke on the Prophet's Neck
 24029001	KJV	His Letter to the Exiles
@@ -858,7 +834,6 @@ verse_id	version	heading_plain
 26023001	KJV	The Two Sisters
 26024001	KJV	The End of the Siege
 26025001	KJV	Judgement upon the Nations
-26025001	KJV	Ammon
 26025007	KJV	Moab
 26025011	KJV	Edom
 26025014	KJV	Philistia
@@ -991,7 +966,6 @@ verse_id	version	heading_plain
 38007001	KJV	True Righteousness
 38008001	KJV	A City of Truth
 38009001	KJV	The City of God
-38009001	KJV	Look to the Lord
 38009008	KJV	The King of Peace
 38009014	KJV	He Will Save His People
 38010005	KJV	Judah and Israel
@@ -1023,7 +997,6 @@ verse_id	version	heading_plain
 40006001	KJV	Real Religion
 40006023	KJV	True Wisdom
 40008004	KJV	Marvellous Deeds
-40008004	KJV	Power Over Disease
 40008017	KJV	Power Over Men
 40008022	KJV	Power Over Nature
 40008027	KJV	Power Over Devils
@@ -1242,7 +1215,6 @@ verse_id	version	heading_plain
 43001034	KJV	His First Disciples
 43002001	KJV	His First Miracle
 43002012	KJV	The First Passover
-43003001	KJV	Nicodemus
 43003021	KJV	John the Baptist
 43004004	KJV	The Woman of Samaria
 43005001	KJV	At Another Festival
@@ -1339,7 +1311,6 @@ verse_id	version	heading_plain
 45008017	KJV	A Glory to be Revealed
 45008030	KJV	More than Conquerors
 45009001	KJV	The Problem of the Jews
-45009001	KJV	The Rejection of Israel
 45009013	KJV	The Problem
 45009029	KJV	The Divine Justice of It
 45011001	KJV	The Divine Purpose in It
