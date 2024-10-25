@@ -3,10 +3,10 @@
         {{ verse.D }}
     </div>
     <div class="verse-container" v-html="verse.T"></div>
-    <span v-if="verse.P" class="text-slate-800 -mb-[30px] mt-[20px]" >¶</span>
-    <div v-if="verse.H" class="mb-2">
+    <div v-if="verse.H" class="mt-4 -mb-6">
         <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
     </div>
+    <span v-if="verse.P" class="text-slate-800 -mb-[30px] mt-[20px]" >¶</span>
 </template>
 
 <script setup>
