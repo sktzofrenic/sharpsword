@@ -97,7 +97,7 @@ const baseUrl = useBaseUrlStore()
 
 const chapter = ref(1)
 const book = ref('')
-const bookId = ref(57)
+const bookId = ref(1)
 const verses = ref([])
 
 const prevChapter = ref({})
