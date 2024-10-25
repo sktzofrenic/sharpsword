@@ -3,13 +3,36 @@ package bible
 import (
     "github.com/gofiber/fiber/v3"
     "sharpsword/go/database"
+    "sharpsword/go/models"
+    "strconv"
     "fmt"
     "os"
     "context"
+    "strings"
 )
 
 func Register(app *fiber.App) {
-    app.Get("/api/v1/bible", func(c fiber.Ctx) error {
+    app.Get("/api/v1/bible/:version/:book/:chapter", func(c fiber.Ctx) error {
+        version := strings.ToUpper(c.Params("version"))
+
+        book := c.Params("book")
+
+        if book, err := strconv.Atoi(book); err != nil {
+            return c.JSON(fiber.Map{
+                "status": "error",
+                "message": fmt.Sprintf("Book must be a number instead %d was provided", book),
+            })
+        } 
+
+        chapter := c.Params("chapter")
+
+        if chapter, err := strconv.Atoi(chapter); err != nil {
+            return c.JSON(fiber.Map{
+                "status": "error",
+                "message": fmt.Sprintf("Chapter must be a number instead %d was provided", chapter),
+            })
+        }
+
         conn, err := database.Connect()
 
         if err != nil {
@@ -19,26 +42,25 @@ func Register(app *fiber.App) {
 
         defer conn.Close(context.Background())
 
-        rows, err := conn.Query(context.Background(), "SELECT * FROM verses LIMIT 1")
+        query := `SELECT 
+            verse_id,
+            text_formatted
+        FROM verses WHERE version = $1 AND book = $2 AND chapter = $3`
 
-        var rowSlice []string
+        rows, err := conn.Query(context.Background(), query, version, book, chapter)
+
+        var rowSlice []models.Verse
 
         for rows.Next() {
-            type rowType struct {
-                text_plain string
-                text_formatted string
-                version string
-                verse_id int
-                book int
-                chapter int
-                verse int
-            }
-            var row rowType
-            err := rows.Scan(&row.verse_id, &row.book, &row.chapter, &row.verse, &row.text_plain, &row.text_formatted, &row.version)
+            var row models.Verse
+            err := rows.Scan(
+                &row.ID,
+                &row.T,
+            )
             if err != nil {
                 fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)
             }
-            rowSlice = append(rowSlice, row.text_plain)
+            rowSlice = append(rowSlice, row)
         }
         
         if err != nil {
@@ -46,9 +68,9 @@ func Register(app *fiber.App) {
             os.Exit(1)
         }
 
+
         return c.JSON(fiber.Map{
-            "status": "success",
-            "verses": rowSlice,
+            "v": rowSlice,
         })
     })
 }
