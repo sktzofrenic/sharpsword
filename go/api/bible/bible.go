@@ -43,9 +43,20 @@ func Register(app *fiber.App) {
         defer conn.Close(context.Background())
 
         query := `SELECT 
-            verse_id,
-            text_formatted
-        FROM verses WHERE version = $1 AND book = $2 AND chapter = $3`
+            text_formatted,
+            coalesce(headings.heading_plain, '') as heading,
+            books.book_name as book,
+            verses.verse_id,
+            coalesce(paragraphs.verse_id, 0) as paragraph,
+            chapter
+        FROM verses
+            left join books on verses.book = books.book_id
+            left join descriptions on verses.verse_id = descriptions.verse_id and descriptions.version = $1
+            left join headings on verses.verse_id = headings.verse_id and headings.version = $1
+            left join paragraphs on verses.verse_id = paragraphs.verse_id and paragraphs.version = $1
+        WHERE verses.version = $1 AND book = $2 AND chapter = $3
+        ORDER BY verses.verse_id ASC;
+        `
 
         rows, err := conn.Query(context.Background(), query, version, book, chapter)
 
@@ -54,8 +65,12 @@ func Register(app *fiber.App) {
         for rows.Next() {
             var row models.Verse
             err := rows.Scan(
-                &row.ID,
                 &row.T,
+                &row.H,
+                &row.B,
+                &row.ID,
+                &row.P,
+                &row.C,
             )
             if err != nil {
                 fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)

@@ -37,10 +37,7 @@
                     A Psalm and Song at the dedication of the house of David.
                 </div>
                 <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto">
-
-<span class="verse v1" data-usfm="PSA.1.1"><span class="label">1</span><span class="content">Blessed </span><span class="add"><span class="content">is</span></span><span class="content"> the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners,</span></span> <span class="verse v1" data-usfm="PSA.1.1"><span class="content">Nor sitteth in the seat of the scornful.</span></span> <span class="verse v1" data-usfm="PSA.1.1"></span>
-                    <span class="verse v2" data-usfm="PSA.1.2"><span class="label">2</span><span class="content">But his delight </span><span class="add"><span class="content">is</span></span><span class="content"> in the law of the </span><span class="nd"><span class="content">LORD</span></span><span class="content">;</span></span> <span class="verse v2" data-usfm="PSA.1.2"><span class="content">And in his law doth he meditate day and night.</span></span> <span class="verse v2" data-usfm="PSA.1.2"></span>
-                    <span class="verse v3" data-usfm="PSA.1.3"><span class="label">3</span><span class="content">And he shall be like a tree planted by the rivers of water,</span></span> <span class="verse v3" data-usfm="PSA.1.3"><span class="content">That bringeth forth his fruit in his season;</span></span> <span class="verse v3" data-usfm="PSA.1.3"><span class="content">His leaf also shall not wither;</span></span> <span class="verse v3" data-usfm="PSA.1.3"><span class="content">And whatsoever he doeth shall prosper.</span></span> <span class="verse v3" data-usfm="PSA.1.3"></span>
+                    <Verse v-for="verse in verses" :key="verse.n" :verse="verse" />
                 </div>
 
             </div>
@@ -79,27 +76,33 @@
 
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-</script>
-<style scoped>
-.label {
-    vertical-align: top;
-    font-size: 0.8em;
-    margin-left: 1.2em;
-    margin-right: -0.6em;
-    color: #9ca3af;
-}
-:nth-child(1 of span.content) {
-    margin-left: 0.8em;
-}
-.nd {
-    transform: uppercase;
-    margin-left: -0.8em;
-}
-.add {
-    font-style: italic;
-    margin-left: -0.8em;
-}
-.verse {
+import Verse from '@/components/Verse.vue'
+import {onMounted, ref} from 'vue'
+import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
+import http from '@/http'
+
+const baseUrl = useBaseUrlStore()
+
+const chapter = ref(1)
+const book = ref('')
+const verses = ref([])
+
+const getVerses = async () => {
+    try {
+        var url = `${baseUrl.baseUrl}/api/v1/bible/kjv/1/30`
+        const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/1/30`)
+        verses.value = response.data.v
+    } catch (error) {
+        console.error(error)
+    }
 }
 
+onMounted(() => {
+    console.log('mounted')
+    getVerses()
+})
+
+
+</script>
+<style scoped>
 </style>

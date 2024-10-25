@@ -6,6 +6,7 @@ import (
     "github.com/gofiber/fiber/v3"
     "github.com/gofiber/fiber/v3/middleware/static"
     recoverer "github.com/gofiber/fiber/v3/middleware/recover"
+    "github.com/gofiber/fiber/v3/middleware/cors"
     "sharpsword/go/api/bible"
     "sharpsword/go/settings"
     "github.com/goccy/go-json"
@@ -20,6 +21,7 @@ func main() {
     })
 
     app.Use(recoverer.New())
+    app.Use(cors.New())
 
     app.Get("/*", static.New(("./public")))
 
