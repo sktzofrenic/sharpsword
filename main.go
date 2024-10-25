@@ -5,14 +5,21 @@ import (
     "log"
     "github.com/gofiber/fiber/v3"
     "github.com/gofiber/fiber/v3/middleware/static"
+    recoverer "github.com/gofiber/fiber/v3/middleware/recover"
     "sharpsword/go/api/bible"
     "sharpsword/go/settings"
+    "github.com/goccy/go-json"
 )
 
 func main() {
     settings := settings.GetSettings()
 
-    app := fiber.New()
+    app := fiber.New(fiber.Config{
+        JSONEncoder: json.Marshal,
+        JSONDecoder: json.Unmarshal,
+    })
+
+    app.Use(recoverer.New())
 
     app.Get("/*", static.New(("./public")))
 
