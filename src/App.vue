@@ -1,6 +1,12 @@
 
 <template>
-    <VersePicker />
+    <Transition name="fade">
+        <Search @close="searchClosed" v-if="showSearch" />
+    </Transition>
+    <Transition name="fade">
+        <VersePicker @close="versePickerClosed" v-if="showVersePicker" />
+    </Transition>
+    <VersePicker @close="versePickerClosed" v-if="showVersePicker" />
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4">
@@ -16,7 +22,7 @@
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-text-size"></i>
                         </button>
-                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false">
+                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showSearch = true">
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -55,7 +61,7 @@
                     <span class="cursor-pointer" @click="changeChapter(prevChapter)">
                         <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
                     </span>
-                    <span class="font-bold py-1">
+                    <span class="font-bold py-1 w-1/2" @click="showVersePicker = true">
                         {{ book }} {{ chapter }}
                     </span>
                     <span class="cursor-pointer" @click="changeChapter(nextChapter)">
@@ -73,7 +79,7 @@
                         <i class="fa-sharp-duotone fa-solid fa-ballot-check text-xl block"></i>
                         <span class="text-xs">Plans</span>
                     </div>
-                    <div class="flex flex-col items-center text-slate-200 w-14">
+                    <div class="flex flex-col items-center text-slate-200 w-14" @click="showSearch = true">
                         <i class="fa-solid fa-magnifying-glass text-xl block"></i>
                         <span class="text-xs">Search</span>
                     </div>
@@ -88,9 +94,9 @@
 </template>
 
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
 import Verse from '@/components/Verse.vue'
 import VersePicker from '@/components/VersePicker.vue'
+import Search from '@/components/Search.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
@@ -102,10 +108,19 @@ const book = ref('')
 const bookId = ref(1)
 const verses = ref([])
 const versesContainer = ref(null)
+const showVersePicker = ref(false)
+const showSearch = ref(false)
 
 const prevChapter = ref({})
 const nextChapter = ref({})
 
+const searchClosed = () => {
+    showSearch.value = false
+}
+
+const versePickerClosed = () => {
+    showVersePicker.value = false
+}
 
 const changeChapter = (reference) => {
     bookId.value = reference.bookId

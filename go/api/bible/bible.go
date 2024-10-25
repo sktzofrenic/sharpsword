@@ -12,6 +12,50 @@ import (
 )
 
 func Register(app *fiber.App) {
+
+    app.Get("/api/v1/bible/:version", func(c fiber.Ctx) error {
+        version := strings.ToUpper(c.Params("version"))
+
+        conn, err := database.Connect()
+
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+            os.Exit(1)
+        }
+
+        defer conn.Close(context.Background())
+
+        // query := `SELECT
+        //     books.book_name as book,
+        //     books.book_id as book_id,
+        // FROM books
+        // WHERE books.version = $1
+        // ORDER BY books.book_id ASC;
+        // `
+        // rows, err := conn.Query(context.Background(), query, version)
+        //
+        // var rowSlice []models.Book
+        //
+        // for rows.Next() {
+        //     var row models.Book
+        //     err := rows.Scan(
+        //         &row.B,
+        //         &row.BID,
+        //     )
+        //     if err != nil {
+        //         fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)
+        //     }
+        //     rowSlice = append(rowSlice, row)
+        // }
+        //
+        // if err != nil {
+        //     fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+        //     os.Exit(1)
+        // }
+
+        return c.SendString("Placeholder")
+    })
+
     app.Get("/api/v1/bible/:version/:book/:chapter", func(c fiber.Ctx) error {
         version := strings.ToUpper(c.Params("version"))
 
