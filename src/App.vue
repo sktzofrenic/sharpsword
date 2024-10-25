@@ -1,6 +1,6 @@
 
 <template>
-    <!-- <VersePicker /> -->
+    <VersePicker />
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4">
