@@ -30,14 +30,20 @@
         <main>
             <div class="mx-auto max-w-7xl px-6 py-6 sm:px-6 lg:px-8 text-slate-100 pb-40">
                 <div class="w-full flex flex-col justify-center items-center">
-                    <div class="text-md font-semi-bold">Psalm</div>
-                    <div class="font-bold text-6xl">30</div>
-                </div>
-                <div class="w-full italic px-4 my-6 flex justify-center text-lg">
-                    A Psalm and Song at the dedication of the house of David.
+                    <div class="text-md font-semi-bold">
+                        {{ activeBook }}
+                    </div>
+                    <div class="font-bold text-6xl mb-8">
+                        {{ activeChapter }}
+                    </div>
                 </div>
                 <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto">
                     <Verse v-for="verse in verses" :key="verse.n" :verse="verse" />
+                    <div class="flex justify-center mt-6">
+                        <button class="text-slate-600 italic text-sm">
+                            KJV text in the public domain.
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -46,7 +52,9 @@
             <div class="mx-auto max-w-7xl px-4 text-slate-200 flex items-center justify-center">
                 <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
                     <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
-                    <span class="font-bold py-1">Exodus 45</span>
+                    <span class="font-bold py-1">
+                        {{ activeBook }} {{ activeChapter }}
+                    </span>
                     <i class="fa-solid fa-right text-xl px-4 text-slate-500"></i>
                 </div>
             </div>
@@ -77,7 +85,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Verse from '@/components/Verse.vue'
-import {onMounted, ref} from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
 
@@ -87,10 +95,24 @@ const chapter = ref(1)
 const book = ref('')
 const verses = ref([])
 
+const activeBook = computed(() => {
+    // find all unique books in verses
+    const books = verses.value.map(verse => verse.B)
+    return [...new Set(books)].join(' - ')
+})
+
+const activeChapter = computed(() => {
+    // find all unique books in verses
+    const chapters = verses.value.map(verse => verse.C)
+    return [...new Set(chapters)].join(' - ')
+})
+
 const getVerses = async () => {
     try {
-        var url = `${baseUrl.baseUrl}/api/v1/bible/kjv/1/30`
-        const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/1/30`)
+        const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/30/1`)
+        if (response.data.v === null) {
+            return
+        }
         verses.value = response.data.v
     } catch (error) {
         console.error(error)
@@ -98,11 +120,8 @@ const getVerses = async () => {
 }
 
 onMounted(() => {
-    console.log('mounted')
     getVerses()
 })
 
 
 </script>
-<style scoped>
-</style>

@@ -1,4 +1,7 @@
 <template>
+    <div v-if="verse.D" class="w-full italic flex justify-center text-lg">
+        {{ verse.D }}
+    </div>
     <div class="verse-container" v-html="verse.T"></div>
     <span v-if="verse.P" class="text-slate-800 -mb-[30px] mt-[20px]" >¶</span>
     <div v-if="verse.H" class="mb-2">
