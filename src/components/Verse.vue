@@ -1,8 +1,8 @@
 <template>
     <div class="verse-container" v-html="verse.T"></div>
-    <div v-if="verse.P" style="height: 1em"></div>
+    <span v-if="verse.P" class="text-slate-800 -mb-[30px] mt-[20px]" >¶</span>
     <div v-if="verse.H" class="mb-2">
-        <span class="italic text-2xl">{{ verse.H }}</span>
+        <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
     </div>
 </template>
 
