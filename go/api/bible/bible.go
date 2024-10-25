@@ -14,7 +14,7 @@ import (
 func Register(app *fiber.App) {
 
     app.Get("/api/v1/bible/:version", func(c fiber.Ctx) error {
-        version := strings.ToUpper(c.Params("version"))
+        // version := strings.ToUpper(c.Params("version"))
 
         conn, err := database.Connect()
 
