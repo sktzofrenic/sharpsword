@@ -35,6 +35,7 @@ func Register(app *fiber.App) {
                 books.book_name as n,
                 books.book_abbreviation as a,
                 books.testament as t,
+                books.book_id as i,
                 coalesce(
                     (
                     SELECT

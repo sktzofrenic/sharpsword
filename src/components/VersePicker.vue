@@ -4,7 +4,7 @@
 
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-slate-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div class="relative transform overflow-hidden w-full rounded-lg bg-slate-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                     <div class="absolute right-0 top-0 pr-4 pt-4">
                         <button type="button" class="rounded-md bg-slate-900 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" @click="close">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
@@ -12,7 +12,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="text-slate-100 mb-2">
+                    <div class="text-slate-100 mb-4">
                         <h3 class="text-lg font-medium leading-6 text-slate-100" id="modal-title">
                             <button type="button" 
                                 class="rounded-md bg-slate-800 px-2 py-1 font-semibold text-slate-100 shadow-sm mr-4" 
@@ -29,7 +29,7 @@
                         </h3>
                     </div>
                     <Transition name="fade" mode="out-in">
-                        <div class="max-h-[70vh] overflow-y-auto pr-2" v-if="selectedBook === null">
+                        <div class="h-[70vh] overflow-y-auto pr-2" v-if="selectedBook === null">
                             <div class="flex flex-wrap gap-4  overflow-y-auto pr-2">
                                 <div class="text-slate-100 px-2 py-1 rounded-md bg-blue-900" 
                                     @click="selectBook(book)"
@@ -49,15 +49,15 @@
                                     v-for="(book, index) in ntBooks">{{book.n}}</div>
                             </div>
                         </div>
-                        <div class="max-h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter === null">
-                            <div class="grid grid-cols-6 gap-4">
+                        <div class="h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter === null">
+                            <div class="grid grid-cols-5 gap-4">
                                 <div class="text-slate-100 px-4 py-2 rounded-md bg-slate-800 text-center cusor-pointer" 
                                     @click="selectChapter(index + 1)"
                                     v-for="(chapter, index) in chapters">{{index + 1}}</div>
                             </div>
                         </div>
-                        <div class="max-h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter !== null">
-                            <div class="grid grid-cols-6 gap-4">
+                        <div class="h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter !== null">
+                            <div class="grid grid-cols-5 gap-4">
                                 <div class="text-slate-100 px-4 py-2 rounded-md bg-indigo-900 text-center cursor-pointer" 
                                     @click="selectVerse(verse)"
                                     v-for="(verse, index) in verses">{{verse}}</div>
@@ -108,7 +108,11 @@ const goBack = () => {
 }
 
 const selectVerse = (verse) => {
-    emits('verse', verse)
+    emits('verse', {
+        book: selectedBook.value.i,
+        chapter: selectedChapter.value,
+        verse: verse
+    })
 }
 
 const selectBook = (book) => {

@@ -114,6 +114,9 @@ const prevChapter = ref({})
 const nextChapter = ref({})
 
 const verse = (verse) => {
+    bookId.value = verse.book
+    chapter.value = verse.chapter
+    getVerses()
     showVersePicker.value = false
 }
 
