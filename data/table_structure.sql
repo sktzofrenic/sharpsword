@@ -1,4 +1,4 @@
-create table books
+create table if not exists books
 (
     book_id           integer not null
         constraint books_pk
@@ -8,7 +8,7 @@ create table books
     testament         text
 );
 
-create table verses
+create table if not exists verses
 (
     verse_id       integer not null,
     book           integer
@@ -24,13 +24,13 @@ create table verses
         primary key (verse_id, version)
 );
 
-create index ix_verses_tsv
+create index if not exists ix_verses_tsv
     on verses using gin (ts_vec);
 
-create index verses_verse_id_index
+create index if not exists verses_verse_id_index
     on verses (verse_id);
 
-create table paragraphs
+create table if not exists paragraphs
 (
     verse_id integer,
     version  text,
@@ -38,7 +38,7 @@ create table paragraphs
         foreign key (verse_id, version) references verses
 );
 
-create table descriptions
+create table if not exists descriptions
 (
     verse_id          integer,
     version           text,
@@ -47,7 +47,7 @@ create table descriptions
         foreign key (verse_id, version) references verses
 );
 
-create table headings
+create table if not exists headings
 (
     verse_id      integer,
     version       text,
