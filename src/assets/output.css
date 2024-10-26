@@ -933,18 +933,6 @@ select {
   height: 100vh;
 }
 
-.max-h-\[80vh\] {
-  max-height: 80vh;
-}
-
-.max-h-8 {
-  max-height: 2rem;
-}
-
-.max-h-\[75\] {
-  max-height: 75;
-}
-
 .max-h-\[75vh\] {
   max-height: 75vh;
 }
@@ -1174,6 +1162,10 @@ select {
   padding-bottom: 10rem;
 }
 
+.pr-2 {
+  padding-right: 0.5rem;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
@@ -1188,14 +1180,6 @@ select {
 
 .pt-5 {
   padding-top: 1.25rem;
-}
-
-.pr-8 {
-  padding-right: 2rem;
-}
-
-.pr-2 {
-  padding-right: 0.5rem;
 }
 
 .text-left {
