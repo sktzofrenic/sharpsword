@@ -1,4 +1,4 @@
-create table if not exists books
+create table if not exists public.books
 (
     book_id           integer not null
         constraint books_pk
@@ -8,12 +8,12 @@ create table if not exists books
     testament         text
 );
 
-create table if not exists verses
+create table if not exists public.verses
 (
     verse_id       integer not null,
     book           integer
         constraint verses_books_book_id_fk
-            references books,
+            references public.books,
     chapter        integer,
     verse          integer,
     text_plain     text,
@@ -25,34 +25,43 @@ create table if not exists verses
 );
 
 create index if not exists ix_verses_tsv
-    on verses using gin (ts_vec);
+    on public.verses using gin (ts_vec);
 
 create index if not exists verses_verse_id_index
-    on verses (verse_id);
+    on public.verses (verse_id);
 
-create table if not exists paragraphs
+create index if not exists verses_chapter_index
+    on public.verses (chapter);
+
+create index if not exists verses_book_index
+    on public.verses (book);
+
+create index if not exists verses_book_chapter_index
+    on public.verses (book, chapter);
+
+create table if not exists public.paragraphs
 (
     verse_id integer,
     version  text,
     constraint paragraphs_verses_verse_id_version_fk
-        foreign key (verse_id, version) references verses
+        foreign key (verse_id, version) references public.verses
 );
 
-create table if not exists descriptions
+create table if not exists public.descriptions
 (
     verse_id          integer,
     version           text,
     description_plain text,
     constraint descriptions_verses_verse_id_version_fk
-        foreign key (verse_id, version) references verses
+        foreign key (verse_id, version) references public.verses
 );
 
-create table if not exists headings
+create table if not exists public.headings
 (
     verse_id      integer,
     version       text,
     heading_plain text,
     constraint headings_verses_verse_id_version_fk
-        foreign key (verse_id, version) references verses
+        foreign key (verse_id, version) references public.verses
 );
 
