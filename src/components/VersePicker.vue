@@ -51,7 +51,7 @@
                         </div>
                         <div class="h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter === null">
                             <div class="grid grid-cols-5 gap-4">
-                                <div class="text-slate-100 px-4 py-2 rounded-md bg-slate-800 text-center cusor-pointer" 
+                                <div class="text-slate-100 px-4 py-2 rounded-md bg-slate-800 text-center cursor-pointer" 
                                     @click="selectChapter(index + 1)"
                                     v-for="(chapter, index) in chapters">{{index + 1}}</div>
                             </div>
