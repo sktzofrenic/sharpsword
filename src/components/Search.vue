@@ -62,7 +62,6 @@ To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 </template>
 
 <script setup>
-import { defineEmits } from 'vue'
 const emits = defineEmits(['close'])
 
 const close = () => {
