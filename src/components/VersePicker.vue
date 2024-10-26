@@ -1,29 +1,9 @@
 <template>
     <div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!--
-Background backdrop, show/hide based on modal state.
-
-Entering: "ease-out duration-300"
-From: "opacity-0"
-To: "opacity-100"
-Leaving: "ease-in duration-200"
-From: "opacity-100"
-To: "opacity-0"
--->
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <!--
-Modal panel, show/hide based on modal state.
-
-Entering: "ease-out duration-300"
-From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-To: "opacity-100 translate-y-0 sm:scale-100"
-Leaving: "ease-in duration-200"
-From: "opacity-100 translate-y-0 sm:scale-100"
-To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
--->
                 <div class="relative transform overflow-hidden rounded-lg bg-slate-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                     <div class="absolute right-0 top-0 pr-4 pt-4">
                         <button type="button" class="rounded-md bg-slate-900 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" @click="close">
@@ -32,20 +12,64 @@ To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             </svg>
                         </button>
                     </div>
-                    <div class="text-slate-100 mb-2">Select Book</div>
-                    <div class="flex flex-wrap gap-2 max-h-[75vh] overflow-y-auto pr-2">
-                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md">Genesis</div>
-                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md">Exodus</div>
-                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md">Leveticus</div>
-                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md">Numbers</div>
-                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md">Deuteronomy</div>
+                    <div class="text-slate-100 mb-2">
+                        <h3 class="text-lg font-medium leading-6 text-slate-100" id="modal-title">
+                            <button type="button" 
+                                class="rounded-md bg-slate-800 px-2 py-1 font-semibold text-slate-100 shadow-sm mr-4" 
+                                @click="goBack" v-if="selectedBook || selectedChapter">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Back
+                            </button>
+                            <span v-if="selectedBook !== null">{{selectedBook.n}}</span>
+                            <span v-else>Select a book</span>
+
+                            <span v-if="selectedChapter !== null" class="ml-2">{{selectedChapter}}</span>
+                            <span v-else></span>
+
+                        </h3>
                     </div>
-                    <div class="sm:flex sm:items-start">
+                    <Transition name="fade" mode="out-in">
+                        <div class="max-h-[70vh] overflow-y-auto pr-2" v-if="selectedBook === null">
+                            <div class="flex flex-wrap gap-4  overflow-y-auto pr-2">
+                                <div class="text-slate-100 px-2 py-1 rounded-md bg-blue-900" 
+                                    @click="selectBook(book)"
+                                    v-for="(book, index) in otBooks">{{book.n}}</div>
+                            </div>
+                            <div class="relative my-4">
+                                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                    <div class="w-full border-t border-slate-300"></div>
+                                </div>
+                                <div class="relative flex justify-center">
+                                    <span class="bg-slate-900 px-2 text-sm text-slate-100">NT</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-4 overflow-y-auto pr-2">
+                                <div class="text-slate-100 px-2 py-1 rounded-md bg-indigo-900" 
+                                    @click="selectBook(book)"
+                                    v-for="(book, index) in ntBooks">{{book.n}}</div>
+                            </div>
+                        </div>
+                        <div class="max-h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter === null">
+                            <div class="grid grid-cols-6 gap-4">
+                                <div class="text-slate-100 px-4 py-2 rounded-md bg-slate-800 text-center cusor-pointer" 
+                                    @click="selectChapter(index + 1)"
+                                    v-for="(chapter, index) in chapters">{{index + 1}}</div>
+                            </div>
+                        </div>
+                        <div class="max-h-[70vh] overflow-y-auto pr-2" v-else-if="selectedBook !== null && selectedChapter !== null">
+                            <div class="grid grid-cols-6 gap-4">
+                                <div class="text-slate-100 px-4 py-2 rounded-md bg-indigo-900 text-center cursor-pointer" 
+                                    @click="selectVerse(verse)"
+                                    v-for="(verse, index) in verses">{{verse}}</div>
+                            </div>
+                        </div>
+                    </Transition>
+                    <div class="sm:flex sm:items-start" v-if="selectedBook === null">
                         <div class="mt-6 text-center">
                             <div class="mt-2">
                                 <div class="relative">
                                     <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Filter</label>
-                                    <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Genesis...">
+                                    <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Book name...">
                                 </div>
                             </div>
                         </div>
@@ -61,22 +85,59 @@ To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
 
-const emits = defineEmits(['close'])
+const emits = defineEmits(['close', 'verse'])
 const baseUrl = useBaseUrlStore()
-const bibleData = ref([])
+const bibleData = ref({ b: [] })
+const selectedBook = ref(null)
+const selectedChapter = ref(null)
 
 const close = () => {
     emits('close')
 }
 
+const goBack = () => {
+    if (selectedChapter.value) {
+        selectedChapter.value = null
+    } else {
+        selectedBook.value = null
+    }
+}
+
+const selectVerse = (verse) => {
+    emits('verse', verse)
+}
+
+const selectBook = (book) => {
+    selectedBook.value = book
+}
+
+const selectChapter = (chapter) => {
+    selectedChapter.value = chapter
+}
+
+const otBooks = computed(() => {
+    return bibleData.value.b.filter(book => book.t === 'OT')
+})
+
+const ntBooks = computed(() => {
+    return bibleData.value.b.filter(book => book.t === 'NT')
+})
+
+const chapters = computed(() => {
+    return selectedBook.value.c
+})
+
+const verses = computed(() => {
+    return Array.from({ length: selectedBook.value.c[selectedChapter.value - 1].v}, (_, i) => i + 1)
+})
+
 const getBibleData = async () => {
     try {
         const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv`)
-        console.log(response.data)
         bibleData.value = response.data
     } catch (error) {
         console.error(error)

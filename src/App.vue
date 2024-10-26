@@ -4,9 +4,8 @@
         <Search @close="searchClosed" v-if="showSearch" />
     </Transition>
     <Transition name="fade">
-        <VersePicker @close="versePickerClosed" v-if="showVersePicker" />
+        <VersePicker @close="versePickerClosed" @verse="verse" v-if="showVersePicker"/>
     </Transition>
-    <VersePicker @close="versePickerClosed" v-if="showVersePicker" />
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4">
@@ -61,7 +60,7 @@
                     <span class="cursor-pointer" @click="changeChapter(prevChapter)">
                         <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
                     </span>
-                    <span class="font-bold py-1 w-1/2" @click="showVersePicker = true">
+                    <span class="font-bold py-1 w-1/2 cursor-pointer" @click="showVersePicker = true">
                         {{ book }} {{ chapter }}
                     </span>
                     <span class="cursor-pointer" @click="changeChapter(nextChapter)">
@@ -113,6 +112,10 @@ const showSearch = ref(false)
 
 const prevChapter = ref({})
 const nextChapter = ref({})
+
+const verse = (verse) => {
+    showVersePicker.value = false
+}
 
 const searchClosed = () => {
     showSearch.value = false

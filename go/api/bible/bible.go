@@ -14,8 +14,6 @@ import (
 func Register(app *fiber.App) {
 
     app.Get("/api/v1/bible/:version", func(c fiber.Ctx) error {
-        // version := strings.ToUpper(c.Params("version"))
-
         conn, err := database.Connect()
 
         if err != nil {
@@ -25,35 +23,52 @@ func Register(app *fiber.App) {
 
         defer conn.Close(context.Background())
 
-        // query := `SELECT
-        //     books.book_name as book,
-        //     books.book_id as book_id,
-        // FROM books
-        // WHERE books.version = $1
-        // ORDER BY books.book_id ASC;
-        // `
-        // rows, err := conn.Query(context.Background(), query, version)
-        //
-        // var rowSlice []models.Book
-        //
-        // for rows.Next() {
-        //     var row models.Book
-        //     err := rows.Scan(
-        //         &row.B,
-        //         &row.BID,
-        //     )
-        //     if err != nil {
-        //         fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)
-        //     }
-        //     rowSlice = append(rowSlice, row)
-        // }
-        //
-        // if err != nil {
-        //     fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-        //     os.Exit(1)
-        // }
+        query := `
+            SELECT
+            json_build_object(
+                'b',
+                json_agg(books)
+            ) books
+            from
+            (
+                select
+                books.book_name as n,
+                books.book_abbreviation as a,
+                books.testament as t,
+                coalesce(
+                    (
+                    SELECT
+                        json_agg(
+                        row_to_json(verses)
+                        )
+                    FROM
+                        (
+                        SELECT
+                            count(*) as v
+                        FROM
+                            verses
+                        WHERE
+                            verses.book = books.book_id
+                        group by
+                            chapter
+                        order by
+                            chapter
+                        ) verses
+                    ),
+                    '[]'
+                ) AS c
+                from
+                    books
+                order by
+                    books.book_id
+            ) books
+        `
+        var json_data string
+        err = conn.QueryRow(context.Background(), query).Scan(&json_data)
 
-        return c.SendString("Placeholder")
+        return c.SendString(
+            fmt.Sprintf("%s", json_data),
+        )
     })
 
     app.Get("/api/v1/bible/:version/:book/:chapter", func(c fiber.Ctx) error {
