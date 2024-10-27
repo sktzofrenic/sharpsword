@@ -1,4 +1,6 @@
-create table if not exists public.books
+grant connect, create, temporary on database db_07cf41ed to us_45a313c2;
+
+create table public.books
 (
     book_id           integer not null
         constraint books_pk
@@ -8,7 +10,7 @@ create table if not exists public.books
     testament         text
 );
 
-create table if not exists public.verses
+create table public.verses
 (
     verse_id       integer not null,
     book           integer
@@ -24,43 +26,49 @@ create table if not exists public.verses
         primary key (verse_id, version)
 );
 
-create index if not exists ix_verses_tsv
+create index ix_verses_tsv
     on public.verses using gin (ts_vec);
 
-create index if not exists verses_verse_id_index
+create index verses_verse_id_index
     on public.verses (verse_id);
 
-create index if not exists verses_chapter_index
+create index verses_chapter_index
     on public.verses (chapter);
 
-create index if not exists verses_book_index
+create index verses_book_index
     on public.verses (book);
 
-create index if not exists verses_book_chapter_index
+create index verses_book_chapter_index
     on public.verses (book, chapter);
 
-create table if not exists public.paragraphs
+create table public.paragraphs
 (
     verse_id integer,
     version  text,
+    constraint unique_paragraphs
+        unique (verse_id, version),
     constraint paragraphs_verses_verse_id_version_fk
         foreign key (verse_id, version) references public.verses
 );
 
-create table if not exists public.descriptions
+create table public.descriptions
 (
     verse_id          integer,
     version           text,
     description_plain text,
+    constraint descriptions_pk
+        unique (verse_id, version),
     constraint descriptions_verses_verse_id_version_fk
         foreign key (verse_id, version) references public.verses
 );
 
-create table if not exists public.headings
+create table public.headings
 (
     verse_id      integer,
     version       text,
     heading_plain text,
+    constraint headings_pk
+        unique (verse_id, version),
     constraint headings_verses_verse_id_version_fk
         foreign key (verse_id, version) references public.verses
 );
