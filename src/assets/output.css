@@ -866,6 +866,10 @@ select {
   margin-bottom: 6rem;
 }
 
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
 .mb-8 {
   margin-bottom: 2rem;
 }
@@ -914,8 +918,28 @@ select {
   margin-top: 20px;
 }
 
-.mb-4 {
-  margin-bottom: 1rem;
+.-ml-3 {
+  margin-left: -0.75rem;
+}
+
+.-ml-2 {
+  margin-left: -0.5rem;
+}
+
+.-ml-1 {
+  margin-left: -0.25rem;
+}
+
+.-mb-2 {
+  margin-bottom: -0.5rem;
+}
+
+.-mb-4 {
+  margin-bottom: -1rem;
+}
+
+.-mb-8 {
+  margin-bottom: -2rem;
 }
 
 .block {
@@ -946,20 +970,16 @@ select {
   height: 1.5rem;
 }
 
+.h-\[70vh\] {
+  height: 70vh;
+}
+
 .h-full {
   height: 100%;
 }
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[70vh\] {
-  height: 70vh;
-}
-
-.max-h-\[70vh\] {
-  max-height: 70vh;
 }
 
 .max-h-\[75vh\] {
@@ -1022,10 +1042,6 @@ select {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.grid-cols-6 {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .grid-cols-5 {

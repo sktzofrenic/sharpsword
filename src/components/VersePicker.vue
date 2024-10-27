@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-4 overflow-y-auto pr-2">
-                                <div class="text-slate-100 px-2 py-1 rounded-md bg-indigo-900 cursor-pointers" 
+                                <div class="text-slate-100 px-2 py-1 rounded-md bg-indigo-900 cursor-pointer" 
                                     @click="selectBook(book)"
                                     v-for="(book, index) in ntBooks">{{book.n}}</div>
                             </div>
