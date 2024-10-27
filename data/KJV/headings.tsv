@@ -1,6 +1,8 @@
 verse_id	version	heading_plain
 11015024	KJV	Israel and Nadab
 18003001	KJV	The Debate - Job's Outburst
+4020001	KJV	Wandering in the Wilderness, Water from the Rock
+2020021	KJV	Worship and Justice, The Book of the Covenant
 43003001	KJV	Nicodemus
 1003001	KJV	The Fall
 1004001	KJV	Cain and Abel
@@ -55,8 +57,6 @@ verse_id	version	heading_plain
 2016001	KJV	Manna
 2018001	KJV	Jethro
 2019001	KJV	At Mount Sinai
-2020021	KJV	The Book of the Covenant
-2020021	KJV	Worship and Justice
 2024001	KJV	The Covenant Confirmed
 2025009	KJV	The Pattern of the Tabernacle
 2028001	KJV	Priests
@@ -66,39 +66,18 @@ verse_id	version	heading_plain
 2034001	KJV	The Covenant is Renewed
 2035001	KJV	The Building of the Tabernacle
 2036007	KJV	The Tabernacle
-19119001	KJV	א Aleph
-19119016	KJV	ג Gimel
-19119024	KJV	ד Dalet
 19119032	KJV	ה He
-19119040	KJV	ו Waw
-19119048	KJV	ז Zain
-19119064	KJV	ט Tet
 19119072	KJV	י Yod
-19119080	KJV	כ Kaph
-19119088	KJV	ל Lamed
 19119096	KJV	מ Mem
-19119104	KJV	נ Nun
-19119112	KJV	ס Samek
 19119136	KJV	צ Zade
-19119160	KJV	ש Shin
 19119168	KJV	ת Taw
-19119001	KJV	א Aleph
 19119008	KJV	ב Bet
 19119016	KJV	ג Gimel
-19119024	KJV	ד Dalet
-19119032	KJV	ה He
-19119040	KJV	ו Waw
-19119048	KJV	ז Zain
-19119064	KJV	ט Tet
-19119080	KJV	כ Kaph
 19119088	KJV	ל Lamed
 19119104	KJV	נ Nun
-19119112	KJV	ס Samek
 19119128	KJV	פ Pe
-19119136	KJV	צ Zade
 19119144	KJV	ק Qoph
 19119160	KJV	ש Shin
-19119168	KJV	ת Taw
 2037001	KJV	The Ark
 2037024	KJV	The Altars
 2039001	KJV	The Ephod
@@ -161,8 +140,6 @@ verse_id	version	heading_plain
 4018001	KJV	Law of Priests and Levites
 4019001	KJV	The Red Heifer
 4019010	KJV	Purification
-4020001	KJV	Wandering in the Wilderness
-4020001	KJV	Water from the Rock
 4020013	KJV	Israel and Edom
 4020021	KJV	Death of Aaron
 4021003	KJV	Brasen Serpent
@@ -184,8 +161,6 @@ verse_id	version	heading_plain
 4036001	KJV	Inheritance of Daughters
 5004043	KJV	This is the Law
 5012001	KJV	The Book of the Covenant
-5012001	KJV	Statutes and Judgements
-5012001	KJV	Religious Statutes
 5016017	KJV	Civil Statutes
 5019001	KJV	Criminal Law
 5021014	KJV	Other Statutes
@@ -305,7 +280,6 @@ verse_id	version	heading_plain
 11012025	KJV	Golden Calves
 11013001	KJV	At Beth-el's Altar
 11014001	KJV	Jeroboam's Son
-11014020	KJV	Judah
 11014020	KJV	Rehoboam
 11015001	KJV	Abijam
 11015008	KJV	Asa
@@ -354,7 +328,6 @@ verse_id	version	heading_plain
 12015031	KJV	Jotham
 12016001	KJV	Ahaz
 12017001	KJV	Fall of Samaria
-12018001	KJV	Judah
 12018001	KJV	Hezekiah
 12018012	KJV	Assyria's Threat
 12019004	KJV	Isaiah's Counsel
@@ -372,7 +345,6 @@ verse_id	version	heading_plain
 12024001	KJV	Jehoiakim
 12024007	KJV	Jehoiachin
 12024009	KJV	Fall of Jerusalem
-13001001	KJV	Official Lists
 13001001	KJV	Adam's Descendants
 13001042	KJV	Kings of Edom
 13002001	KJV	Sons of Israel
@@ -394,7 +366,6 @@ verse_id	version	heading_plain
 13011001	KJV	From Hebron to Jerusalem
 13011009	KJV	David's Mighty Men
 13013001	KJV	The Ark of the Lord is brought to Jerusalem
-13013001	KJV	A Solemn Journey
 13014001	KJV	Gifts from Tyre
 13014002	KJV	David's Family
 13014007	KJV	His Victories
@@ -406,7 +377,6 @@ verse_id	version	heading_plain
 13021017	KJV	An Altar unto the Lord
 13022001	KJV	Plans for the Temple
 13023001	KJV	Temple Appointments
-13023001	KJV	Priests and Levites
 13025001	KJV	Musicians and Singers
 13026001	KJV	Officers and Judges
 13027001	KJV	Overseers
@@ -428,7 +398,6 @@ verse_id	version	heading_plain
 14010005	KJV	King Rehoboam
 14010015	KJV	Revolt of Ten Tribes
 14011001	KJV	Jerusalem the capital of Judah
-14011001	KJV	Its Fortifications and Fenced Cities
 14012001	KJV	Attacked by Egypt
 14013001	KJV	Abijah's Reign
 14014001	KJV	Asa
@@ -539,7 +508,6 @@ verse_id	version	heading_plain
 19010001	KJV	ל Lamed
 19010002	KJV	(מ Mem)
 19010003	KJV	(נ Nun)
-19010006	KJV	(ס Samek)
 19010006	KJV	פ Pe
 19010008	KJV	ע Ain
 19010009	KJV	(צ Zade)
@@ -548,11 +516,9 @@ verse_id	version	heading_plain
 19010014	KJV	ש Shin
 19010016	KJV	ת Taw
 19025001	KJV	א Aleph
-19025002	KJV	ב Bet
 19025002	KJV	ג Gimel
 19025003	KJV	ד Dalet
 19025004	KJV	ה He
-19025005	KJV	(ו Waw)
 19025005	KJV	ז Zain
 19025006	KJV	ח Het
 19025007	KJV	ט Tet
@@ -610,50 +576,28 @@ verse_id	version	heading_plain
 19037034	KJV	ר Resh
 19037036	KJV	ש Shin
 19037038	KJV	ת Taw
-19111001	KJV	א Aleph
 19111001	KJV	ב Bet
-19111001	KJV	ג Gimel
-19111002	KJV	ד Dalet
 19111002	KJV	ה He
-19111004	KJV	ח Het
 19111004	KJV	ט Tet
 19111005	KJV	י Yod
-19111005	KJV	כ Kaph
-19111008	KJV	ע Ain
 19111008	KJV	פ Pe
-19111010	KJV	ש Shin
 19111010	KJV	ת Taw
-19112001	KJV	א Aleph
-19112001	KJV	ב Bet
 19112001	KJV	ג Gimel
-19112003	KJV	ו Waw
 19112003	KJV	ז Zain
-19112006	KJV	ל Lamed
 19112006	KJV	מ Mem
 19112007	KJV	נ Nun
-19112007	KJV	ס Samek
 19112009	KJV	צ Zade
-19112009	KJV	ק Qoph
-19112009	KJV	ר Resh
 19112010	KJV	ש Shin
-19112010	KJV	ת Taw
 19119001	KJV	א Aleph
-19119016	KJV	ג Gimel
 19119024	KJV	ד Dalet
-19119032	KJV	ה He
 19119040	KJV	ו Waw
 19119048	KJV	ז Zain
 19119056	KJV	ח Het
 19119064	KJV	ט Tet
 19119080	KJV	כ Kaph
-19119088	KJV	ל Lamed
-19119104	KJV	נ Nun
 19119112	KJV	ס Samek
 19119120	KJV	ע Ain
-19119136	KJV	צ Zade
 19119152	KJV	ר Resh
-19119160	KJV	ש Shin
-19119168	KJV	ת Taw
 19145002	KJV	ג Gimel
 19145003	KJV	ד Dalet
 19145004	KJV	ה He
@@ -811,7 +755,6 @@ verse_id	version	heading_plain
 26002001	KJV	His Call
 26003015	KJV	His Mission
 26004001	KJV	Before the fall of Jerusalem
-26004001	KJV	Symbols of its Fall
 26005004	KJV	The City's Destruction
 26006001	KJV	The Desolation of the Land
 26007001	KJV	A Day of Doom
@@ -879,7 +822,6 @@ verse_id	version	heading_plain
 27005001	KJV	Belshazzar's Feast
 27005024	KJV	The Writing on the Wall
 27006001	KJV	The Den of Lions
-27007001	KJV	Daniel's Visions
 27007001	KJV	Four Great Beasts
 27008001	KJV	A Ram and Goat
 27009001	KJV	The Time of Restoration
@@ -887,9 +829,6 @@ verse_id	version	heading_plain
 28002001	KJV	Israel, a Faithless Wife
 28003001	KJV	Her Purchase Price
 28003003	KJV	Israel's Return
-28004001	KJV	The 
-28004001	KJV	LORD
-28004001	KJV	's Controversy
 28005001	KJV	Against Priests and Kings
 28006001	KJV	A Brief Repentance
 28007001	KJV	A Half-baked Cake
@@ -915,7 +854,6 @@ verse_id	version	heading_plain
 30004001	KJV	The Women of Samaria
 30005001	KJV	The Worshippers of Beth-el
 30006001	KJV	The Rulers at Ease
-30007001	KJV	Visions of Judgement
 30007001	KJV	Locusts
 30007003	KJV	Fire
 30007006	KJV	The Plumbline
@@ -939,10 +877,6 @@ verse_id	version	heading_plain
 34003001	KJV	The End of Nineveh
 35002001	KJV	His Watchtower
 35003001	KJV	His Prayer
-36001001	KJV	The Day of the 
-36001001	KJV	LORD
-36001001	KJV	's Wrath
-36001001	KJV	The Day of the Lord
 36002003	KJV	The Philistines
 36002007	KJV	Moab and Ammon
 36002011	KJV	Ethiopia and Assyria
@@ -953,7 +887,6 @@ verse_id	version	heading_plain
 37002017	KJV	Build for a Great Future
 38001002	KJV	Call to Repentance
 38001006	KJV	Visions of the Night
-38001006	KJV	Among the Myrtle Trees
 38001017	KJV	Four Horns
 38002001	KJV	A Measuring Line
 38003001	KJV	The Trial of the High Priest
@@ -962,7 +895,6 @@ verse_id	version	heading_plain
 38005004	KJV	An Ephah and a Talent
 38006001	KJV	Four Chariots
 38006008	KJV	The New Jerusalem
-38006008	KJV	A Coronation
 38007001	KJV	True Righteousness
 38008001	KJV	A City of Truth
 38009001	KJV	The City of God
@@ -971,6 +903,8 @@ verse_id	version	heading_plain
 38010005	KJV	Judah and Israel
 38011001	KJV	Their Glory is Spoiled
 38012001	KJV	A Trembling City
+28004001	KJV	The LORD's Controversy
+36001001	KJV	The Day of the LORD's Wrath
 38012009	KJV	A Day of Mourning
 38013001	KJV	A Cleansing Fountain
 38014001	KJV	The City Saved
@@ -985,7 +919,6 @@ verse_id	version	heading_plain
 40002001	KJV	Wise Men from the East
 40002012	KJV	The Flight to Egypt
 40002018	KJV	Return to Nazareth
-40003001	KJV	His Baptism and Temptation
 40003001	KJV	John the Baptist
 40003012	KJV	The Baptism of Jesus
 40004001	KJV	His Temptation
@@ -1044,7 +977,6 @@ verse_id	version	heading_plain
 40020001	KJV	Labourers in the Vineyard
 40020019	KJV	Mother of James and John
 40020029	KJV	Two Blind Men
-40021001	KJV	In Jerusalem
 40021001	KJV	Triumphal Entry
 40021011	KJV	Cleansed the Temple
 40021017	KJV	The Barren Fig Tree
@@ -1098,11 +1030,9 @@ verse_id	version	heading_plain
 41009001	KJV	Mount of Transfiguration
 41009032	KJV	Capernaum
 41010001	KJV	Jesus in Judæa
-41010001	KJV	Beyond Jordan
 41010031	KJV	On the Way to Jerusalem
 41010034	KJV	The Sons of Zebedee
 41010045	KJV	Jericho
-41011001	KJV	Holy Week
 41011001	KJV	Sunday
 41011011	KJV	Monday
 41011019	KJV	Tuesday
@@ -1178,7 +1108,6 @@ verse_id	version	heading_plain
 42018034	KJV	On the Jericho Road
 42019001	KJV	Zacchæus
 42019011	KJV	Parable of the Pounds
-42019027	KJV	In Jerusalem
 42019027	KJV	Triumphal Entry
 42019044	KJV	Jesus in the Temple
 42020008	KJV	Wicked Husbandmen
@@ -1226,7 +1155,6 @@ verse_id	version	heading_plain
 43010021	KJV	The Feast of the Dedication
 43011001	KJV	The Lord of Life
 43011054	KJV	The Approaching Passover
-43013001	KJV	The Third Passover
 43013001	KJV	The Last Supper
 43015001	KJV	The True Vine
 43017001	KJV	The Prayer of Jesus
