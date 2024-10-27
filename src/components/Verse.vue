@@ -1,8 +1,8 @@
 <template>
-    <div v-if="verse.D" class="w-full italic flex justify-center text-lg">
+    <div v-if="verse.D" class="w-full italic flex justify-center text-lg mb-4">
         {{ verse.D }}
     </div>
-    <div class="verse-container" v-html="verse.T"></div>
+    <div class="verse-container" :class="[fontSize, lineHeight]" v-html="verse.T"></div>
     <div v-if="verse.H" class="mt-6">
         <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
     </div>
@@ -15,7 +15,15 @@ import { ref } from 'vue'
 const props = defineProps({
     verse: Object,
     key: Number,
-    index: Number
+    index: Number,
+    fontSize: {
+        type: String,
+        default: 'verse-text-xl'
+    },
+    lineHeight: {
+        type: String,
+        default: 'verse-leading-loose'
+    }
 })
 
 </script>
@@ -26,6 +34,42 @@ const props = defineProps({
     margin-left: 1.2em;
     margin-right: 0.4em;
     color: #9ca3af;
+}
+.verse-text-2xl {
+    font-size: 1.5rem; /* 24px */
+}
+.verse-text-xl {
+    font-size: 1.25rem; /* 20px */
+}
+.verse-text-lg {
+    font-size: 1.125rem; /* 18px */
+}
+.verse-text-base {
+    font-size: 1rem; /* 16px */
+}
+.verse-text-sm {
+    font-size: 0.875rem; /* 14px */
+}
+.verse-text-xs {
+    font-size: 0.75rem; /* 12px */
+}
+.verse-leading-none {
+	line-height: 1;
+}
+.verse-leading-tight {
+    line-height: 1.25;
+}
+.verse-leading-snug {
+    line-height: 1.375;
+}
+.verse-leading-normal {
+    line-height: 1.5;
+}
+.verse-leading-relaxed {
+    line-height: 1.625;
+}
+.verse-leading-loose {
+    line-height: 2;
 }
 .verse-container :deep(:nth-child(n + 2 of .verse)) {
     margin-left: 0.8em;

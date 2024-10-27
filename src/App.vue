@@ -17,10 +17,7 @@
                     </div>
                     <div class="-mr-2 flex">
                         <!-- Mobile menu button -->
-                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false">
-                            <span class="absolute -inset-0.5"></span>
-                            <i class="fa-solid fa-text-size"></i>
-                        </button>
+                        <ReadingSettings />
                         <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showSearch = true">
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -95,6 +92,7 @@
 <script setup>
 import Verse from '@/components/Verse.vue'
 import VersePicker from '@/components/VersePicker.vue'
+import ReadingSettings from '@/components/ReadingSettings.vue'
 import Search from '@/components/Search.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
