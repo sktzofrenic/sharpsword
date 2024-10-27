@@ -6,9 +6,13 @@
     <Transition name="fade">
         <VersePicker @close="versePickerClosed" @verse="verse" v-if="showVersePicker"/>
     </Transition>
+    
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
-            <div class="mx-auto max-w-7xl pr-4">
+            <div class="mx-auto max-w-7xl pr-4 relative">
+                <Transition name="fade">
+                    <ReadingSettings v-if="showReadingSettings" />
+                </Transition>
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -17,7 +21,10 @@
                     </div>
                     <div class="-mr-2 flex">
                         <!-- Mobile menu button -->
-                        <ReadingSettings />
+                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showReadingSettings = !showReadingSettings">
+                            <span class="absolute -inset-0.5"></span>
+                            <i class="fa-solid fa-text-size"></i>
+                        </button>
                         <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showSearch = true">
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -41,7 +48,12 @@
                     </div>
                 </div>
                 <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto" >
-                    <Verse v-for="(verse, index) in verses" :key="verse.verse_id" :verse="verse" :index=index />
+                    <Verse v-for="(verse, index) in verses" 
+                        :key="verse.verse_id" 
+                        :fontSize="store.fontSize"
+                        :lineHeight="store.lineHeight"
+                        :verse="verse" 
+                        :index=index />
                     <div class="flex justify-center mb-24 mt-8">
                         <button class="text-slate-600 italic text-sm">
                             KJV text in the public domain.
@@ -96,10 +108,13 @@ import ReadingSettings from '@/components/ReadingSettings.vue'
 import Search from '@/components/Search.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
+import { useAppStore } from '@/stores/appStore.js'
 import http from '@/http'
 
 const baseUrl = useBaseUrlStore()
+const store = useAppStore()
 
+const showReadingSettings = ref(false)
 const chapter = ref(1)
 const book = ref('')
 const bookId = ref(1)

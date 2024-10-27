@@ -1,18 +1,36 @@
 <template>
-        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showReadingSettings = !showReadingSettings">
-            <span class="absolute -inset-0.5"></span>
-            <i class="fa-solid fa-text-size"></i>
-        </button>
-        <Transition name="fade" mode="out-in">
-            <div class="fixed z-10 top-20 left-8 w-screen" v-if="showReadingSettings">
-                <div class="px-4 py-2 bg-slate-800 border-b border-slate-600 rounded-lg shadow-slate-900 shadow-lg">
-                    <h3 class="font-semibold text-slate-100">Reading Settings</h3>
-                    <div class="text-slate-100">
-                        <p>And here's some amazing content. It's very engaging. Right?</p>
-                    </div>
+    <div class="absolute z-10 w-[90vw] right-6 sm:w-[20vw] top-20">
+        <div class="px-4 py-2 bg-slate-800 border-b border-slate-600 rounded-lg shadow-slate-900 shadow-xl">
+            <h3 class="font-semibold text-slate-100">Reading Settings</h3>
+            <div class="text-slate-100 mb-2">
+                <div class="flex justify-between items-center mt-4 bg-slate-900 px-4 py-2 rounded-lg">
+                    <button @click="decreaseFontSize" class="text-slate-100 disabled:text-slate-600" :disabled="displayFontSize(store.fontSize) === 'XS'">
+                        <i class="fa-solid fa-minus text-xl"></i>
+                    </button>
+                    <span class="text-slate-400">Font Size: 
+                        <span class="text-slate-100">{{displayFontSize(store.fontSize)}}</span>
+                    </span>
+                    <button @click="increaseFontSize" class="text-slate-100 disabled:text-slate-600" :disabled="displayFontSize(store.fontSize) === '2XL'">
+                        <i class="fa-solid fa-plus text-xl"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mt-4 bg-slate-900 px-4 py-2 rounded-lg">
+                    <button @click="decreaseLineHeight" class="text-slate-100 disabled:text-slate-600" :disabled="displayLineHeight(store.lineHeight) === 'None'">
+                        <i class="fa-solid fa-minus text-xl"></i>
+                    </button>
+                    <span class="text-slate-400">
+                        Line Height: 
+                        <span class="text-slate-100">{{displayLineHeight(store.lineHeight)}}</span>
+                    </span>
+                    <button @click="increaseLineHeight" 
+                        class="text-slate-100 disabled:text-slate-600" 
+                        :disabled="displayLineHeight(store.lineHeight) === 'Loose'">
+                        <i class="fa-solid fa-plus text-xl"></i>
+                    </button>
                 </div>
             </div>
-        </Transition>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -21,7 +39,64 @@ import { useAppStore } from '@/stores/appStore.js'
 
 const store = useAppStore()
 
-const showReadingSettings = ref(false)
+const displayFontSize = (size) => {
+    const sizes = {
+        'verse-text-xs': 'XS',
+        'verse-text-sm': 'SM',
+        'verse-text-base': 'MD',
+        'verse-text-lg': 'LG',
+        'verse-text-xl': 'XL',
+        'verse-text-2xl': '2XL'
+    }
+    return sizes[size]
+}
+
+const displayLineHeight = (size) => {
+    const sizes = {
+        'verse-leading-none': 'None',
+        'verse-leading-tight': 'Tight',
+        'verse-leading-snug': 'Snug',
+        'verse-leading-normal': 'Normal',
+        'verse-leading-loose': 'Loose'
+    }
+    return sizes[size]
+}
+
+const increaseFontSize = () => {
+    const sizes = ['verse-text-xs', 'verse-text-sm', 'verse-text-base', 'verse-text-lg', 'verse-text-xl', 'verse-text-2xl']
+    const index = sizes.indexOf(store.fontSize)
+    if (index < sizes.length - 1) {
+        store.fontSize = sizes[index + 1]
+        localStorage.setItem('fontSize', store.fontSize)
+    }
+}
+
+const decreaseFontSize = () => {
+    const sizes = ['verse-text-xs', 'verse-text-sm', 'verse-text-base', 'verse-text-lg', 'verse-text-xl', 'verse-text-2xl']
+    const index = sizes.indexOf(store.fontSize)
+    if (index > 0) {
+        store.fontSize = sizes[index - 1]
+        localStorage.setItem('fontSize', store.fontSize)
+    }
+}
+
+const increaseLineHeight = () => {
+    const sizes = ['verse-leading-none', 'verse-leading-tight', 'verse-leading-snug', 'verse-leading-normal', 'verse-leading-loose']
+    const index = sizes.indexOf(store.lineHeight)
+    if (index < sizes.length - 1) {
+        store.lineHeight = sizes[index + 1]
+        localStorage.setItem('lineHeight', store.lineHeight)
+    }
+}
+
+const decreaseLineHeight = () => {
+    const sizes = ['verse-leading-none', 'verse-leading-tight', 'verse-leading-snug', 'verse-leading-normal', 'verse-leading-loose']
+    const index = sizes.indexOf(store.lineHeight)
+    if (index > 0) {
+        store.lineHeight = sizes[index - 1]
+        localStorage.setItem('lineHeight', store.lineHeight)
+    }
+}
 
 
 </script>

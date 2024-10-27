@@ -24,7 +24,7 @@ export const useAppStore = defineStore('app', () => {
     return { 
         theme,
         lineHeight,
-        fontSize
+        fontSize,
     }
 })
 

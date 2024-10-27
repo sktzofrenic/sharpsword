@@ -871,6 +871,14 @@ select {
   right: auto;
 }
 
+.right-10 {
+  right: 2.5rem;
+}
+
+.right-6 {
+  right: 1.5rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -888,6 +896,16 @@ select {
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.mx-10 {
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
 }
 
 .-mb-\[30px\] {
@@ -1062,6 +1080,18 @@ select {
   width: 16rem;
 }
 
+.w-\[80vw\] {
+  width: 80vw;
+}
+
+.w-\[90vw\] {
+  width: 90vw;
+}
+
+.w-svw {
+  width: 100svw;
+}
+
 .max-w-7xl {
   max-width: 80rem;
 }
@@ -1072,6 +1102,10 @@ select {
 
 .max-w-screen-md {
   max-width: 768px;
+}
+
+.max-w-\[80vw\] {
+  max-width: 80vw;
 }
 
 .flex-shrink-0 {
@@ -1608,7 +1642,16 @@ select {
   --tw-ring-offset-color: #1e293b;
 }
 
+.disabled\:text-slate-600:disabled {
+  --tw-text-opacity: 1;
+  color: rgb(71 85 105 / var(--tw-text-opacity));
+}
+
 @media (min-width: 640px) {
+  .sm\:right-16 {
+    right: 4rem;
+  }
+
   .sm\:my-8 {
     margin-top: 2rem;
     margin-bottom: 2rem;
@@ -1632,6 +1675,18 @@ select {
 
   .sm\:w-full {
     width: 100%;
+  }
+
+  .sm\:w-\[15vw\] {
+    width: 15vw;
+  }
+
+  .sm\:w-\[10vw\] {
+    width: 10vw;
+  }
+
+  .sm\:w-\[20vw\] {
+    width: 20vw;
   }
 
   .sm\:max-w-lg {
