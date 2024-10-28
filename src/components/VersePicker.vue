@@ -35,7 +35,7 @@
                                     @click="selectBook(book)"
                                     v-for="(book, index) in otBooks">{{book.n}}</div>
                             </div>
-                            <div class="relative my-4">
+                            <div class="relative my-4" v-if="ntBooks.length > 0">
                                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
                                     <div class="w-full border-t border-slate-300"></div>
                                 </div>
@@ -69,7 +69,7 @@
                             <div class="mt-2">
                                 <div class="relative">
                                     <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Filter</label>
-                                    <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Book name...">
+                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Book name..." v-model="searchTerm">
                                 </div>
                             </div>
                         </div>
@@ -94,6 +94,7 @@ const baseUrl = useBaseUrlStore()
 const bibleData = ref({ b: [] })
 const selectedBook = ref(null)
 const selectedChapter = ref(null)
+const searchTerm = ref('')
 
 const close = () => {
     emits('close')
@@ -124,10 +125,18 @@ const selectChapter = (chapter) => {
 }
 
 const otBooks = computed(() => {
+    // if search term is not empty, filter books
+    if (searchTerm.value) {
+        return bibleData.value.b.filter(book => book.t === 'OT' && book.n.toLowerCase().includes(searchTerm.value.toLowerCase()))
+    }
     return bibleData.value.b.filter(book => book.t === 'OT')
 })
 
 const ntBooks = computed(() => {
+    // if search term is not empty, filter books
+    if (searchTerm.value) {
+        return bibleData.value.b.filter(book => book.t === 'NT' && book.n.toLowerCase().includes(searchTerm.value.toLowerCase()))
+    }
     return bibleData.value.b.filter(book => book.t === 'NT')
 })
 

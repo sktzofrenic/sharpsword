@@ -11,7 +11,7 @@
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4 relative">
                 <Transition name="fade">
-                    <ReadingSettings v-if="showReadingSettings" />
+                    <ReadingSettings v-if="showReadingSettings" @close="showReadingSettings = false"/>
                 </Transition>
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">

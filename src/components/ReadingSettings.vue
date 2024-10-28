@@ -28,6 +28,12 @@
                         <i class="fa-solid fa-plus text-xl"></i>
                     </button>
                 </div>
+                <!-- close button -->
+                <div class="flex justify-center mt-4">
+                    <button @click="close" class="bg-slate-900 px-4 py-2 font-semibold text-slate-100 shadow-sm mr-4 rounded-lg">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -36,6 +42,12 @@
 <script setup>
 import {ref} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
+
+const emits = defineEmits(['close'])
+
+const close = () => {
+    emits('close')
+}
 
 const store = useAppStore()
 
