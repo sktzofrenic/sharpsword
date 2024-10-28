@@ -2,7 +2,10 @@
     <div v-if="verse.D" class="w-full italic flex justify-center text-lg mb-4">
         {{ verse.D }}
     </div>
-    <div class="verse-container" :class="[fontSize, lineHeight]" v-html="verse.T"></div>
+    <div class="verse-container" 
+        @click="selectVerse(verse.ID)"
+        :class="[fontSize, lineHeight, selected ? 'selected' : '', presented ? 'presented': '']" v-html="verse.T">
+    </div>
     <div v-if="verse.H" class="mt-6">
         <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
     </div>
@@ -12,10 +15,24 @@
 <script setup>
 import { ref } from 'vue'
 
+const emits = defineEmits(['selectVerse'])
+
+const selectVerse = (verse_id) => {
+    emits('selectVerse', verse_id)
+}
+
 const props = defineProps({
     verse: Object,
     key: Number,
     index: Number,
+    selected: {
+        type: Boolean,
+        default: false
+    },
+    presented: {
+        type: Boolean,
+        default: false
+    },
     fontSize: {
         type: String,
         default: 'verse-text-xl'
@@ -28,6 +45,13 @@ const props = defineProps({
 
 </script>
 <style scoped>
+.selected :deep(.content)  {
+    text-decoration: dotted;
+    text-decoration-line: underline;
+    text-underline-offset: 7px;
+    text-decoration-color: #ffffff82;
+    transition: all 0.3s ease;
+}
 .verse-container :deep(.label) {
     vertical-align: top;
     font-size: 0.8em;

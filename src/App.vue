@@ -47,11 +47,14 @@
                         {{ chapter }}
                     </div>
                 </div>
-                <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto" >
+                <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto">
                     <Verse v-for="(verse, index) in verses" 
+                        @selectVerse="selectVerse"
                         :key="verse.verse_id" 
                         :fontSize="store.fontSize"
                         :lineHeight="store.lineHeight"
+                        :selected="selectedVerses.includes(verse.ID)"
+                        :presented="presentedVerses.includes(verse.ID)"
                         :verse="verse" 
                         :index=index />
                     <div class="flex justify-center mb-24 mt-8">
@@ -122,9 +125,19 @@ const verses = ref([])
 const versesContainer = ref(null)
 const showVersePicker = ref(false)
 const showSearch = ref(false)
+const presentedVerses = ref([])
+const selectedVerses = ref([])
 
 const prevChapter = ref({})
 const nextChapter = ref({})
+
+const selectVerse = (verseId) => {
+    if (selectedVerses.value.includes(verseId)) {
+        selectedVerses.value = selectedVerses.value.filter(v => v !== verseId)
+    } else {
+        selectedVerses.value.push(verseId)
+    }
+}
 
 const verse = (verse) => {
     bookId.value = verse.book
