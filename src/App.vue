@@ -4,7 +4,7 @@
         <Search @close="searchClosed" v-if="showSearch" />
     </Transition>
     <Transition name="fade">
-        <VersePicker @close="versePickerClosed" @verse="verse" v-if="showVersePicker"/>
+        <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
     </Transition>
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
@@ -124,19 +124,19 @@
             </div>
             <div class="mx-auto max-w-7xl px-8 pb-2">
                 <div class="flex h-16 items-center justify-between">
-                    <div class="flex flex-col items-center text-slate-200 w-14 bg-slate-900 rounded-xl px-8 py-2">
+                    <div class="flex flex-col items-center text-slate-200 w-14 bg-slate-900 rounded-xl px-8 py-2 cursor-pointer">
                         <i class="fa-sharp-duotone fa-solid fa-book-bible text-xl block"></i>
                         <span class="text-xs">Bible</span>
                     </div>
-                    <div class="flex flex-col items-center text-slate-200 w-14">
+                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer">
                         <i class="fa-sharp-duotone fa-solid fa-ballot-check text-xl block"></i>
                         <span class="text-xs">Plans</span>
                     </div>
-                    <div class="flex flex-col items-center text-slate-200 w-14" @click="showSearch = true">
+                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer" @click="showSearch = true" >
                         <i class="fa-solid fa-magnifying-glass text-xl block"></i>
                         <span class="text-xs">Search</span>
                     </div>
-                    <div class="flex flex-col items-center text-slate-200 w-14">
+                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer">
                         <i class="fa-sharp-duotone fa-solid fa-highlighter-line text-xl block"></i>
                         <span class="text-xs">Highlights</span>
                     </div>
@@ -152,7 +152,7 @@ import VersePicker from '@/components/VersePicker.vue'
 import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
 import Search from '@/components/Search.vue'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
 import http from '@/http'
@@ -190,6 +190,9 @@ const updateLastLocation = () => {
 }
 
 const updateHistory = () => {
+    if (history.value.length > 0 && history.value[0].bookId === bookId.value && history.value[0].chapter === chapter.value) {
+        return
+    }
     history.value.unshift({
         bookId: bookId.value,
         book: book.value,
@@ -231,11 +234,11 @@ const selectVerse = (verseId) => {
     }
 }
 
-const verse = (verse) => {
+const verseSelected = (verse) => {
     bookId.value = verse.bookId
     book.value = verse.book
     chapter.value = verse.chapter
-    getVerses()
+    getVerses(parseInt(`${verse.bookId}${String(verse.chapter).padStart(3, '0')}${String(verse.verse).padStart(3, '0')}`))
     showVersePicker.value = false
     updateHistory()
 }
@@ -255,7 +258,15 @@ const changeChapter = (reference) => {
     showHistory.value = false
 }
 
-const getVerses = async () => {
+const scrollToVerse = (verseId) => {
+    const verse = document.getElementById(verseId)
+    if (verse) {
+        verse.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+}
+
+const getVerses = async (verseId) => {
+    presentedVerses.value = []
     try {
         const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/${bookId.value}/${chapter.value}`)
         if (response.data.v === null || response.data.v.length === 0) {
@@ -287,6 +298,19 @@ const getVerses = async () => {
             bookId: bookId.value,
             chapter: chapter.value
         })
+        if (verseId) {
+            // wait for vue nexttick
+            await nextTick()
+
+            scrollToVerse(verseId)
+            presentedVerses.value.push(verseId)
+        }
+        selectedVerses.value = []
+        showHistory.value = false
+        showReadingSettings.value = false
+        setTimeout(() => {
+            presentedVerses.value = []
+        }, 5000)
 
     } catch (error) {
         console.error(error)

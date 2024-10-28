@@ -3,13 +3,17 @@
         {{ verse.D }}
     </div>
     <div class="verse-container cursor-pointer" 
+        style="scroll-margin: 30rem 0;"
+        :id="verse.ID"
         @click="selectVerse(verse.ID)"
         :class="[fontSize, lineHeight, selected ? 'selected' : '', presented ? 'presented': '', highlighted]" v-html="verse.T">
     </div>
     <div v-if="verse.H" class="mt-6">
         <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
     </div>
-    <span v-if="verse.P && index > 0" class="text-slate-800 -mb-[30px] mt-[20px] -ml-1" >¶</span>
+    <span v-if="verse.P && index > 0" class="text-slate-800 -mb-[30px] mt-[20px] -ml-1" >
+        ¶
+    </span>
 </template>
 
 <script setup>
@@ -70,7 +74,22 @@ const props = defineProps({
     box-shadow: 0px 0px 10px #664dd9c2;
 }
 .presented {
-    background-color: #f0f0f0;
+  animation: glow 3s ease-in-out;
+}
+
+@-webkit-keyframes glow {
+  0% {
+    text-shadow: 0 0 0px ##00000000;
+  }
+  25% {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+  }
+  60% {
+    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+  }
+  100% {
+    text-shadow: 0 0 0px ##00000000;
+  }
 }
 .selected :deep(.content)  {
     text-decoration: dotted;

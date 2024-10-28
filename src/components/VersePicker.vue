@@ -89,7 +89,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
 
-const emits = defineEmits(['close', 'verse'])
+const emits = defineEmits(['close', 'verseSelected'])
 const baseUrl = useBaseUrlStore()
 const bibleData = ref({ b: [] })
 const selectedBook = ref(null)
@@ -109,7 +109,7 @@ const goBack = () => {
 }
 
 const selectVerse = (verse) => {
-    emits('verse', {
+    emits('verseSelected', {
         bookId: selectedBook.value.i,
         book: selectedBook.value.n,
         chapter: selectedChapter.value,
