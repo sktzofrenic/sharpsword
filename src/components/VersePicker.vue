@@ -12,7 +12,17 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="text-slate-100 mb-4">
+                    <div class="sm:flex sm:items-start" v-if="selectedBook === null">
+                        <div class="mt-6 text-center">
+                            <div class="mt-2">
+                                <div class="relative">
+                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Filter</label>
+                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Book name..." v-model="searchTerm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-slate-100 my-4 shadow-slate-900 shadow-lg">
                         <h3 class="text-lg font-medium leading-6 text-slate-100" id="modal-title">
                             <button type="button" 
                                 class="rounded-md bg-slate-800 px-2 py-1 font-semibold text-slate-100 shadow-sm mr-4" 
@@ -64,16 +74,6 @@
                             </div>
                         </div>
                     </Transition>
-                    <div class="sm:flex sm:items-start" v-if="selectedBook === null">
-                        <div class="mt-6 text-center">
-                            <div class="mt-2">
-                                <div class="relative">
-                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Filter</label>
-                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Book name..." v-model="searchTerm">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class=" sm:mt-4 sm:flex sm:flex-row-reverse">
                         
                         <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-100 shadow-sm ring-1 ring-inset ring-slate-700 hover:bg-slate-700 sm:mt-0 sm:w-auto" @click="close">Cancel</button>

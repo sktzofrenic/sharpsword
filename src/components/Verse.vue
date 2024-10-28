@@ -55,23 +55,18 @@ const props = defineProps({
 <style scoped>
 .yellow :deep(.content) {
     background-color: #ffe00045;
-    box-shadow: 0px 0px 10px #ffe00045;
 }
 .red :deep(.content) {
     background-color: #922a2aba;
-    box-shadow: 0px 0px 10px #922a2aba;
 }
 .blue :deep(.content) {
     background-color: #275fa5ab;
-    box-shadow: 0px 0px 10px #275fa5ab
 }
 .lime :deep(.content) {
     background-color: #87bc2599;
-    box-shadow: 0px 0px 10px #87bc2599;
 }
 .violet :deep(.content) {
     background-color: #664dd9c2;
-    box-shadow: 0px 0px 10px #664dd9c2;
 }
 .presented {
   animation: glow 3s ease-in-out;

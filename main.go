@@ -8,6 +8,7 @@ import (
     recoverer "github.com/gofiber/fiber/v3/middleware/recover"
     "github.com/gofiber/fiber/v3/middleware/cors"
     "sharpsword/go/api/bible"
+    "sharpsword/go/api/search"
     "sharpsword/go/settings"
     "github.com/goccy/go-json"
 )
@@ -26,6 +27,7 @@ func main() {
     app.Get("/*", static.New(("./public")))
 
     bible.Register(app)
+    search.Register(app)
 
     fmt.Println("Server is running on port " + settings.Port)
 

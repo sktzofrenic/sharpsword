@@ -15,9 +15,9 @@
                     <div class="-mx-4 -my-2 overflow-x-auto max-h-[60vh]">
                         <div class="inline-block min-w-full align-middle sm:px-6 lg:px-8">
                             <table class="min-w-full divide-y divide-slate-700">
-                                <tbody class="divide-y divide-slate-600">
+                                <tbody class="divide-y divide-slate-800">
                                     <tr v-for="item in history" @click="goBack(item)">
-                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-lg font-medium text-white sm:pl-0" >
+                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-lg font-medium text-white sm:pl-0 cursor-pointer" >
                                             {{item.book}} {{item.chapter}}
                                         </td>
                                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
