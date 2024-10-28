@@ -2,7 +2,7 @@
     <div v-if="verse.D" class="w-full italic flex justify-center text-lg mb-4">
         {{ verse.D }}
     </div>
-    <div class="verse-container" 
+    <div class="verse-container cursor-pointer" 
         @click="selectVerse(verse.ID)"
         :class="[fontSize, lineHeight, selected ? 'selected' : '', presented ? 'presented': '', highlighted]" v-html="verse.T">
     </div>
