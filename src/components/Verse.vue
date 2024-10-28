@@ -71,11 +71,17 @@ const props = defineProps({
 .verse-leading-loose {
     line-height: 2;
 }
+.verse-leading-9 {
+    line-height: 2.25;
+}
+.verse-leading-10 {
+    line-height: 2.5;;
+}
 .verse-container :deep(:nth-child(n + 2 of .verse)) {
     margin-left: 0.8em;
 }
 .verse-container :deep(.nd) {
-    transform: uppercase;
+    text-transform: uppercase;
 }
 .verse-container :deep(.add) {
     font-style: italic;

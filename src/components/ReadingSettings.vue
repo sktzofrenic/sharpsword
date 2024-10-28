@@ -24,7 +24,7 @@
                     </span>
                     <button @click="increaseLineHeight" 
                         class="text-slate-100 disabled:text-slate-600" 
-                        :disabled="displayLineHeight(store.lineHeight) === 'Loose'">
+                        :disabled="displayLineHeight(store.lineHeight) === 'Huge'">
                         <i class="fa-solid fa-plus text-xl"></i>
                     </button>
                 </div>
@@ -57,7 +57,9 @@ const displayLineHeight = (size) => {
         'verse-leading-tight': 'Tight',
         'verse-leading-snug': 'Snug',
         'verse-leading-normal': 'Normal',
-        'verse-leading-loose': 'Loose'
+        'verse-leading-loose': 'Loose',
+        'verse-leading-9': 'Very Loose',
+        'verse-leading-10': 'Huge'
     }
     return sizes[size]
 }
@@ -81,7 +83,7 @@ const decreaseFontSize = () => {
 }
 
 const increaseLineHeight = () => {
-    const sizes = ['verse-leading-none', 'verse-leading-tight', 'verse-leading-snug', 'verse-leading-normal', 'verse-leading-loose']
+    const sizes = ['verse-leading-none', 'verse-leading-tight', 'verse-leading-snug', 'verse-leading-normal', 'verse-leading-loose', 'verse-leading-9', 'verse-leading-10']
     const index = sizes.indexOf(store.lineHeight)
     if (index < sizes.length - 1) {
         store.lineHeight = sizes[index + 1]
@@ -90,7 +92,7 @@ const increaseLineHeight = () => {
 }
 
 const decreaseLineHeight = () => {
-    const sizes = ['verse-leading-none', 'verse-leading-tight', 'verse-leading-snug', 'verse-leading-normal', 'verse-leading-loose']
+    const sizes = ['verse-leading-none', 'verse-leading-tight', 'verse-leading-snug', 'verse-leading-normal', 'verse-leading-loose', 'verse-leading-9', 'verse-leading-10']
     const index = sizes.indexOf(store.lineHeight)
     if (index > 0) {
         store.lineHeight = sizes[index - 1]
