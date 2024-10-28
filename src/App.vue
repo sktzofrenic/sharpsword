@@ -55,6 +55,7 @@
                         :lineHeight="store.lineHeight"
                         :selected="selectedVerses.includes(verse.ID)"
                         :presented="presentedVerses.includes(verse.ID)"
+                        :highlighted="findHighlightedVerse(verse.ID)"
                         :verse="verse" 
                         :index=index />
                     <div class="flex justify-center mb-24 mt-8">
@@ -67,6 +68,38 @@
             </div>
         </main>
         <footer class="bg-slate-950 fixed w-full bottom-0 border-slate-600 border-t">
+            <Transition name="slide-fade" mode="out-in">
+                <div class="mx-auto max-w-7xl px-4 text-slate-200 flex items-center justify-center" v-if="selectedVerses.length > 0">
+                    <div class="flex w-full gap-x-6 text-center bg-slate-900 my-2 rounded-2xl py-2 px-2">
+                        <!-- deselect all verses -->
+                        <button class="px-2 text-slate-200 bg-slate-900 rounded-lg py-1"  
+                            @click="highlightSelectedVerses('')">
+                            <i class="fa-regular fa-ban"></i>
+                        </button>
+                        <!-- highlite selected verses -->
+                        <button class="px-2 text-yellow-200 bg-yellow-900 rounded-lg py-1" 
+                            @click="highlightSelectedVerses('yellow')">
+                            <i class="fa-solid fa-highlighter-line"></i>
+                        </button>
+                        <button class="px-2 text-red-200 bg-red-900 rounded-lg py-1" 
+                            @click="highlightSelectedVerses('red')">
+                            <i class="fa-solid fa-highlighter-line"></i>
+                        </button>
+                        <button class="px-2 text-blue-200 bg-blue-900 rounded-lg py-1" 
+                            @click="highlightSelectedVerses('blue')">
+                            <i class="fa-solid fa-highlighter-line"></i>
+                        </button>
+                        <button class="px-2 text-lime-200 bg-lime-900 rounded-lg py-1" 
+                            @click="highlightSelectedVerses('lime')">
+                            <i class="fa-solid fa-highlighter-line"></i>
+                        </button>
+                        <button class="px-2 text-violet-200 bg-violet-900 rounded-lg py-1" 
+                            @click="highlightSelectedVerses('violet')">
+                            <i class="fa-solid fa-highlighter-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </Transition>
             <div class="mx-auto max-w-7xl px-4 text-slate-200 flex items-center justify-center">
                 <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
                     <span class="cursor-pointer" @click="changeChapter(prevChapter)">
@@ -127,9 +160,54 @@ const showVersePicker = ref(false)
 const showSearch = ref(false)
 const presentedVerses = ref([])
 const selectedVerses = ref([])
+const highlightedVerses = ref([])
+const history = ref([])
+const lastLocation = ref({})
 
 const prevChapter = ref({})
 const nextChapter = ref({})
+
+const updateLastLocation = () => {
+    lastLocation.value = {
+        bookId: bookId.value,
+        chapter: chapter.value
+    }
+    // save last location to local storage
+    localStorage.setItem('lastLocation', JSON.stringify(lastLocation.value))
+}
+
+const updateHistory = () => {
+    history.value.unshift({
+        bookId: bookId.value,
+        chapter: chapter.value
+    })
+    // save history to local storage
+    localStorage.setItem('history', JSON.stringify(history.value.slice(0, 100)))
+}
+
+const findHighlightedVerse = (verseId) => {
+    let highlight = highlightedVerses.value.find(v => v.verseId === verseId)
+    return highlight ? highlight.color : ''
+}
+
+const highlightSelectedVerses = (color) => {
+    if (!color) {
+        highlightedVerses.value = highlightedVerses.value.filter(v => !selectedVerses.value.includes(v.verseId))
+        selectedVerses.value = []
+        return
+    }
+    selectedVerses.value.forEach(verseId => {
+        highlightedVerses.value = highlightedVerses.value.filter(v => v.verseId !== verseId)
+
+        highlightedVerses.value.push({
+            verseId: verseId,
+            color: color
+        })
+    })
+    selectedVerses.value = []
+    // save highlighted verses to local storage
+    localStorage.setItem('highlightedVerses', JSON.stringify(highlightedVerses.value))
+}
 
 const selectVerse = (verseId) => {
     if (selectedVerses.value.includes(verseId)) {
@@ -144,6 +222,7 @@ const verse = (verse) => {
     chapter.value = verse.chapter
     getVerses()
     showVersePicker.value = false
+    updateHistory()
 }
 
 const searchClosed = () => {
@@ -187,13 +266,30 @@ const getVerses = async () => {
         chapter.value = response.data.v[0].C
         // scroll to top of verses container
         versesContainer.value.scrollTop = 0
+        updateLastLocation({
+            book: book.value,
+            chapter: chapter.value
+        })
 
     } catch (error) {
         console.error(error)
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
+    // get highlighted verses from local storage
+    highlightedVerses.value = JSON.parse(localStorage.getItem('highlightedVerses')) || []
+    // get history from local storage
+    history.value = JSON.parse(localStorage.getItem('history')) || []
+    // get last location from local storage
+    lastLocation.value = JSON.parse(localStorage.getItem('lastLocation')) || {}
+    console.log(lastLocation.value)
+
+    if (lastLocation.value.bookId && lastLocation.value.chapter) {
+        bookId.value = lastLocation.value.bookId
+        chapter.value = lastLocation.value.chapter
+    }
+
     getVerses()
 })
 

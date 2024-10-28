@@ -4,7 +4,7 @@
     </div>
     <div class="verse-container" 
         @click="selectVerse(verse.ID)"
-        :class="[fontSize, lineHeight, selected ? 'selected' : '', presented ? 'presented': '']" v-html="verse.T">
+        :class="[fontSize, lineHeight, selected ? 'selected' : '', presented ? 'presented': '', highlighted]" v-html="verse.T">
     </div>
     <div v-if="verse.H" class="mt-6">
         <span class="italic text-2xl text-slate-600">{{ verse.H }}</span>
@@ -33,6 +33,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    highlighted: {
+        type: String,
+        default: ''
+    },
     fontSize: {
         type: String,
         default: 'verse-text-xl'
@@ -45,6 +49,29 @@ const props = defineProps({
 
 </script>
 <style scoped>
+.yellow :deep(.content) {
+    background-color: #ffe00045;
+    box-shadow: 0px 0px 10px #ffe00045;
+}
+.red :deep(.content) {
+    background-color: #922a2aba;
+    box-shadow: 0px 0px 10px #922a2aba;
+}
+.blue :deep(.content) {
+    background-color: #275fa5ab;
+    box-shadow: 0px 0px 10px #275fa5ab
+}
+.lime :deep(.content) {
+    background-color: #87bc2599;
+    box-shadow: 0px 0px 10px #87bc2599;
+}
+.violet :deep(.content) {
+    background-color: #664dd9c2;
+    box-shadow: 0px 0px 10px #664dd9c2;
+}
+.presented {
+    background-color: #f0f0f0;
+}
 .selected :deep(.content)  {
     text-decoration: dotted;
     text-decoration-line: underline;
