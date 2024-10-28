@@ -1,7 +1,7 @@
 
 <template>
     <Transition name="fade">
-        <Search @close="searchClosed" v-if="showSearch" />
+        <Search @close="searchClosed" v-show="showSearch" @verseSelected="verseSelected" />
     </Transition>
     <Transition name="fade">
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
@@ -240,6 +240,7 @@ const verseSelected = (verse) => {
     chapter.value = verse.chapter
     getVerses(parseInt(`${verse.bookId}${String(verse.chapter).padStart(3, '0')}${String(verse.verse).padStart(3, '0')}`))
     showVersePicker.value = false
+    showSearch.value = false
     updateHistory()
 }
 

@@ -13,25 +13,34 @@
                         </button>
                     </div>
 
+                    <!--  Add OT and NT filter -->
+                    <div class="flex justify-between mr-12">
+                        <button @click="testament = ''" :class="{'bg-slate-700 text-slate-100': testament === ''}" class="text-slate-300 px-2 py-1 rounded-md">All</button>
+                        <button @click="testament = 'OT'" :class="{'bg-slate-700 text-slate-100': testament === 'OT'}" class="text-slate-300 px-2 py-1 rounded-md">Old Testament</button>
+                        <button @click="testament = 'NT'" :class="{'bg-slate-700 text-slate-100': testament === 'NT'}" class="text-slate-300 px-2 py-1 rounded-md">New Testament</button>
+                    </div>
+
                     <div class="sm:flex sm:items-start">
                         <div class="mt-6 text-center">
                             <div class="my-2">
                                 <div class="relative">
-                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Search</label>
-                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Anything..." v-model="searchTerm">
+                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Keyword Search</label>
+                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Anything..." v-model="searchTerm" ref="search">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="flex flex-col gap-2 h-[75vh] overflow-y-auto pr-2">
-                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md divide-y divide-slate-600" v-for="result in results">
+                    <div class="flex flex-col gap-2 h-[70vh] overflow-y-auto pr-2">
+                        <div class="text-slate-100 px-2 py-1 bg-slate-800 rounded-md divide-y divide-slate-600 hover:bg-slate-700 cursor-pointer" 
+                            @click="selectVerse(result)"
+                            v-for="result in filteredResults">
                             <div v-html="result.H"></div>
                             <div class="text-slate-300 text-sm justify-between flex mt-2 pt-2">
                                 <span class="font-bold">{{result.B}} {{result.C}}:{{result.V}}</span>
                                 <span class="text-slate-300">{{result.R}}</span>
                             </div>
                         </div>
-                        <div v-if="results.length === 0" class="text-slate-100 text-center mt-4">
+                        <div v-if="filteredResults.length === 0" class="text-slate-100 text-center mt-4">
                             No results found
                         </div>
                     </div>
@@ -54,12 +63,27 @@ import http from '@/http'
 const emits = defineEmits(['close', 'verseSelected'])
 const baseUrl = useBaseUrlStore()
 const searchTerm = ref('')
+const testament = ref('')
+
+const filteredResults = computed(() => {
+    return results.value.filter(result => {
+        return result.T.toLowerCase().includes(testament.value.toLowerCase())
+    })
+})
+
+const selectVerse = (verse) => {
+    emits('verseSelected', {
+        bookId: verse.BID,
+        book: verse.B,
+        chapter: verse.C,
+        verse: verse.V
+    })
+}
 
 const close = () => {
     emits('close')
 }
 
-// watch search term and debounce search()
 
 watch(searchTerm, () => {
     search()

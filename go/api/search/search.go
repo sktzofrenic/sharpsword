@@ -27,7 +27,7 @@ func Register(app *fiber.App) {
 
         query := `
                 SELECT
-                verse_id, b.book_name, b.book_id, chapter, verse, ts_headline(text_plain, q), rank as result_rank
+                verse_id, b.book_name, b.testament, b.book_id, chapter, verse, ts_headline(text_plain, q, 'MinWords=40,MaxWords=50'), rank as result_rank
                 FROM (
                 SELECT
                     verse_id, book, chapter, verse, text_plain, ts_rank(ts_vec, q) as rank, q
@@ -54,6 +54,7 @@ func Register(app *fiber.App) {
             err = rows.Scan(
                 &row.ID,
                 &row.B,
+                &row.T,
                 &row.BID,
                 &row.C,
                 &row.V,
