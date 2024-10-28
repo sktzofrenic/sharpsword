@@ -1,6 +1,6 @@
 # SharpSword
 
-SharpSword is a Bible web app written in Go/Vue with a focus of fast search and navigation. 
+SharpSword is a Bible web app written in Go/Vue with a focus of fast search and navigation and a customizable copy/paste function with formatting. 
 
 Live Implementation: [https://sharpsword.io](https://sharpsword.io)
 
