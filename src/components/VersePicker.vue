@@ -110,7 +110,8 @@ const goBack = () => {
 
 const selectVerse = (verse) => {
     emits('verse', {
-        book: selectedBook.value.i,
+        bookId: selectedBook.value.i,
+        book: selectedBook.value.n,
         chapter: selectedChapter.value,
         verse: verse
     })
