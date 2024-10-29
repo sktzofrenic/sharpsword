@@ -1084,6 +1084,10 @@ select {
   gap: 1rem;
 }
 
+.gap-6 {
+  gap: 1.5rem;
+}
+
 .gap-x-5 {
   -moz-column-gap: 1.25rem;
        column-gap: 1.25rem;
@@ -1093,6 +1097,24 @@ select {
   --tw-divide-y-reverse: 0;
   border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
   border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+}
+
+.divide-y-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(2px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(2px * var(--tw-divide-y-reverse));
+}
+
+.divide-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(4px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(4px * var(--tw-divide-y-reverse));
+}
+
+.divide-y-0 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(0px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(0px * var(--tw-divide-y-reverse));
 }
 
 .divide-slate-600 > :not([hidden]) ~ :not([hidden]) {
@@ -1108,6 +1130,11 @@ select {
 .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(30 41 59 / var(--tw-divide-opacity));
+}
+
+.divide-slate-400 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(148 163 184 / var(--tw-divide-opacity));
 }
 
 .overflow-hidden {
@@ -1364,6 +1391,11 @@ select {
   line-height: 1;
 }
 
+.text-base\/7 {
+  font-size: 1rem;
+  line-height: 1.75rem;
+}
+
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -1611,6 +1643,11 @@ select {
 .hover\:text-gray-500:hover {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
+}
+
+.hover\:text-slate-100:hover {
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .hover\:text-slate-200:hover {

@@ -13,6 +13,9 @@
                     <ReadingSettings v-if="showReadingSettings" @close="showReadingSettings = false" />
                 </Transition>
                 <Transition name="fade">
+                    <About v-if="showAbout" @close="showAbout = false" />
+                </Transition>
+                <Transition name="fade">
                     <History v-if="showHistory" @close="showHistory = false"
                         :history="history"
                         @changeChapter="changeChapter"
@@ -38,7 +41,7 @@
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
-                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800" aria-controls="mobile-menu" aria-expanded="false">
+                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800" aria-controls="mobile-menu" aria-expanded="false" @click="showAbout = true">
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-sharp-duotone fa-solid fa-book-bible mr-1"></i> KJV
                         </button>
@@ -156,6 +159,7 @@ import VersePicker from '@/components/VersePicker.vue'
 import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
 import Search from '@/components/Search.vue'
+import About from '@/components/About.vue'
 import { onMounted, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
@@ -166,6 +170,7 @@ const baseUrl = useBaseUrlStore()
 const store = useAppStore()
 
 const showReadingSettings = ref(false)
+const showAbout = ref(false)
 const showHistory = ref(false)
 const chapter = ref(1)
 const book = ref('')
