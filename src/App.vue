@@ -79,7 +79,7 @@
         <footer class="bg-slate-950 fixed w-full bottom-0 border-slate-600 border-t">
             <Transition name="slide-fade" mode="out-in">
                 <div class="mx-auto max-w-7xl px-4 text-slate-200 flex items-center justify-center" v-if="selectedVerses.length > 0">
-                    <div class="flex w-full gap-x-6 text-center bg-slate-900 my-2 rounded-2xl py-2 px-2">
+                    <div class="flex w-full gap-x-5 text-center bg-slate-900 my-2 rounded-2xl py-2 px-2">
                         <!-- deselect all verses -->
                         <button class="px-2 text-slate-200 bg-slate-900 rounded-lg py-1"  
                             @click="highlightSelectedVerses('')">
@@ -105,6 +105,10 @@
                         <button class="px-2 text-violet-200 bg-violet-900 rounded-lg py-1" 
                             @click="highlightSelectedVerses('violet')">
                             <i class="fa-solid fa-highlighter-line"></i>
+                        </button>
+                        <button class="px-2 text-gray-200 bg-slate-900 rounded-lg py-1" 
+                            @click="richCopy">
+                            <i class="fa-regular fa-copy"></i>
                         </button>
                     </div>
                 </div>
@@ -178,6 +182,65 @@ const lastLocation = ref({})
 const prevChapter = ref({})
 const nextChapter = ref({})
 
+// on Ctrl + C do a rich copy
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'c' && e.ctrlKey) {
+        e.preventDefault()
+        richCopy()
+    }
+})
+
+
+const richCopy = () => {
+    try {
+        // get first and last verse from selection and build reference
+        let firstVerse = verses.value.find(v => v.ID === selectedVerses.value[0])
+        let lastVerse = verses.value.find(v => v.ID === selectedVerses.value[selectedVerses.value.length - 1])
+        let firstVerseRef = `${firstVerse.B} ${firstVerse.C}:${parseInt(String(firstVerse.ID).slice(-3))}`
+        let lastVerseRef = `${lastVerse.B} ${lastVerse.C}:${parseInt(String(lastVerse.ID).slice(-3))}`
+        let trimmed = `${lastVerse.B === firstVerse.B ? '' : lastVerse.B} ${lastVerse.C === firstVerse.C ? '' : lastVerse.C + ':'}${parseInt(String(lastVerse.ID).slice(-3))}`
+
+        let content = selectedVerses.value.map((verseId, index) => {
+            let verse = verses.value.find(v => v.ID === verseId)
+
+            let verseNumber = parseInt(String(verse.ID).slice(-3))
+
+            if (selectedVerses.value.length === 1 || index === 0) {
+                verseNumber = ``
+            } else {
+                verseNumber = `<b> v${verseNumber} </b>`
+            }
+            return `<span>${verseNumber} ${verse.T}</span>`
+
+        }).join('')
+
+        if (firstVerseRef === lastVerseRef) {
+            content = `<span><b>${firstVerseRef} </b></span>` + content
+        } else {
+            content = `<span><b>${firstVerseRef}-${trimmed.trim()} </b></span>` + content
+        }
+
+        content += `<style>
+            .label {
+                display: None;
+            }
+            .add {
+                font-style: italic;
+            }
+            .wj {
+                color: #e17777;
+            }
+            </style>`
+
+        const blobInput = new Blob([content], {type: 'text/html'});
+        const clipboardItemInput = new ClipboardItem({'text/html' : blobInput});
+        navigator.clipboard.write([clipboardItemInput]);
+    } catch(e) {
+        // Handle error with user feedback - "Copy failed!" kind of thing
+        console.error(e)
+    }
+}
+
 
 const updateLastLocation = () => {
     lastLocation.value = {
@@ -227,6 +290,16 @@ const highlightSelectedVerses = (color) => {
 }
 
 const selectVerse = (verseId) => {
+    // if holding shift key, select verses between last selected verse and current verse
+    if (event.shiftKey && selectedVerses.value.length > 0) {
+        let lastSelectedVerse = selectedVerses.value[selectedVerses.value.length - 1]
+        let lastSelectedVerseIndex = verses.value.findIndex(v => v.ID === lastSelectedVerse)
+        let currentVerseIndex = verses.value.findIndex(v => v.ID === verseId)
+        let versesToSelect = verses.value.slice(Math.min(lastSelectedVerseIndex, currentVerseIndex), Math.max(lastSelectedVerseIndex, currentVerseIndex) + 1)
+        selectedVerses.value = versesToSelect.map(v => v.ID)
+        return
+    }
+
     if (selectedVerses.value.includes(verseId)) {
         selectedVerses.value = selectedVerses.value.filter(v => v !== verseId)
     } else {
