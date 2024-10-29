@@ -160,6 +160,7 @@ import { onMounted, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
 import http from '@/http'
+import { mobileCheck } from '@/assets/js/mobileDetect.js'
 
 const baseUrl = useBaseUrlStore()
 const store = useAppStore()
@@ -189,9 +190,18 @@ window.addEventListener('keydown', function(e) {
         richCopy()
     }
 })
+//
+// on Ctrl + C do a rich copy
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'p' && e.ctrlKey) {
+        e.preventDefault()
+        richCopy({ plainText: true })
+    }
+})
 
 
-const richCopy = () => {
+
+const richCopy = (options) => {
     try {
         // get first and last verse from selection and build reference
         let firstVerse = verses.value.find(v => v.ID === selectedVerses.value[0])
@@ -220,6 +230,17 @@ const richCopy = () => {
             content = `<span><b>${firstVerseRef}-${trimmed.trim()} </b></span>` + content
         }
 
+
+        if ((options && options.plainText) || mobileCheck()) {
+            // remove span tag with label class including closing tag and content
+            content = content.replace(/<span class="label">.*?<\/span>/gm, '')
+
+            // strip out all html tags from content
+            content = content.replace(/<[^>]*>?/gm, '')
+            navigator.clipboard.writeText(content)
+            return
+        }
+
         content += `<style>
             .label {
                 display: None;
@@ -231,7 +252,6 @@ const richCopy = () => {
                 color: #e17777;
             }
             </style>`
-
         const blobInput = new Blob([content], {type: 'text/html'});
         const clipboardItemInput = new ClipboardItem({'text/html' : blobInput});
         navigator.clipboard.write([clipboardItemInput]);
