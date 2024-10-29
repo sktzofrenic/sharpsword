@@ -386,7 +386,9 @@ const getVerses = async (verseId) => {
             chapter: next.C
         }
 
-        response.data.v.shift()
+        if (!((response.data.v[0].BID === response.data.v[1].BID) && (response.data.v[0].C === response.data.v[1].C))) {
+            response.data.v.shift()
+        } 
         response.data.v.pop()
 
         verses.value = response.data.v

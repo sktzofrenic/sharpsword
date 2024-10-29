@@ -109,7 +109,7 @@ func Register(app *fiber.App) {
         AND verses.verse_id <= (SELECT min(verses.verse_id) FROM verses WHERE version = $1 and verse_id > $2 + 999)
         ORDER BY verses.verse_id ASC;
         `
-        verseId := book_num * 1000000 + chapter_num * 1000
+        verseId := (book_num * 1000000) + (chapter_num * 1000)
 
         rows, err := conn.Query(context.Background(), query, version, verseId)
 
