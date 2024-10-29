@@ -241,10 +241,10 @@ const richCopy = (options) => {
             content = `<span><b>${firstVerseRef}-${trimmed.trim()} </b></span>` + content
         }
 
+        // remove span tag with label class including closing tag and content
+        content = content.replace(/<span class="label">.*?<\/span>/gm, '')
 
         if ((options && options.plainText) || mobileCheck()) {
-            // remove span tag with label class including closing tag and content
-            content = content.replace(/<span class="label">.*?<\/span>/gm, '')
 
             // strip out all html tags from content
             content = content.replace(/<[^>]*>?/gm, '')
@@ -253,9 +253,6 @@ const richCopy = (options) => {
         }
 
         content += `<style>
-            .label {
-                display: None;
-            }
             .add {
                 font-style: italic;
             }
