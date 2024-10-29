@@ -188,6 +188,12 @@ const lastLocation = ref({})
 const prevChapter = ref({})
 const nextChapter = ref({})
 
+
+//computed sorted selected verses
+const sortedSelectedVerses = computed(() => {
+    return selectedVerses.value.sort((a, b) => a - b)
+})
+
 // on Ctrl + C do a rich copy
 window.addEventListener('keydown', function(e) {
     if (e.key === 'c' && e.ctrlKey) {
@@ -209,18 +215,18 @@ window.addEventListener('keydown', function(e) {
 const richCopy = (options) => {
     try {
         // get first and last verse from selection and build reference
-        let firstVerse = verses.value.find(v => v.ID === selectedVerses.value[0])
-        let lastVerse = verses.value.find(v => v.ID === selectedVerses.value[selectedVerses.value.length - 1])
+        let firstVerse = verses.value.find(v => v.ID === sortedSelectedVerses.value[0])
+        let lastVerse = verses.value.find(v => v.ID === sortedSelectedVerses.value[sortedSelectedVerses.value.length - 1])
         let firstVerseRef = `${firstVerse.B} ${firstVerse.C}:${parseInt(String(firstVerse.ID).slice(-3))}`
         let lastVerseRef = `${lastVerse.B} ${lastVerse.C}:${parseInt(String(lastVerse.ID).slice(-3))}`
         let trimmed = `${lastVerse.B === firstVerse.B ? '' : lastVerse.B} ${lastVerse.C === firstVerse.C ? '' : lastVerse.C + ':'}${parseInt(String(lastVerse.ID).slice(-3))}`
 
-        let content = selectedVerses.value.map((verseId, index) => {
+        let content = sortedSelectedVerses.value.map((verseId, index) => {
             let verse = verses.value.find(v => v.ID === verseId)
 
             let verseNumber = parseInt(String(verse.ID).slice(-3))
 
-            if (selectedVerses.value.length === 1 || index === 0) {
+            if (sortedSelectedVerses.value.length === 1 || index === 0) {
                 verseNumber = ``
             } else {
                 verseNumber = `<b> v${verseNumber} </b>`
