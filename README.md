@@ -15,7 +15,7 @@ Live Implementation: [https://sharpsword.io](https://sharpsword.io)
 - Verse highlighting and verse selections with sharing options
 - Data export and import for easy transition to self hosting
 
-![SharpSword](./public/logo/sword_zoom_sq_512.png)
+![SharpSword](https://sharpsword.io/assets/sword_zoom_sq_512-BZyze98q.png)
 
 ## Setup
 
