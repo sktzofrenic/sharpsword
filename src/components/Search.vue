@@ -24,7 +24,12 @@
                         <div class="mt-6 text-center">
                             <div class="my-2">
                                 <div class="relative">
-                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Keyword Search</label>
+                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">
+                                        Keyword Search
+                                        <span class="text-red-500" v-if="totalResults > 0">
+                                            (<span v-if="totalResults > 200">Showing 200 of </span>{{totalResults}} hits)
+                                        </span>
+                                    </label>
                                     <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Anything..." v-model="searchTerm" ref="search">
                                 </div>
                             </div>
@@ -56,14 +61,27 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch} from 'vue'
+import { onMounted, ref, computed, watch, useTemplateRef} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
 
 const emits = defineEmits(['close', 'verseSelected'])
+const props = defineProps(['visible'])
 const baseUrl = useBaseUrlStore()
 const searchTerm = ref('')
 const testament = ref('')
+const totalResults = ref(0)
+const searchElement = useTemplateRef('search')
+
+// watch visible and focus search input and select all text in input when true
+watch(() => props.visible, (newValue, oldValue) => {
+    if (newValue) {
+        setTimeout(() => {
+            searchElement.value.focus()
+            searchElement.value.select()
+        }, 100)
+    }
+})
 
 const filteredResults = computed(() => {
     return results.value.filter(result => {
@@ -102,6 +120,7 @@ const search = async () => {
     try {
         const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/search?q=${searchTerm.value}`)
         results.value = response.data.r
+        totalResults.value = response.data.c
     } catch (error) {
         console.error(error)
     }

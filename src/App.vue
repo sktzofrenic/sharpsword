@@ -1,7 +1,7 @@
 
 <template>
     <Transition name="fade">
-        <Search @close="searchClosed" v-show="showSearch" @verseSelected="verseSelected" />
+        <Search @close="searchClosed" v-show="showSearch" @verseSelected="verseSelected" :visible="showSearch" />
     </Transition>
     <Transition name="fade">
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
@@ -18,7 +18,7 @@
                 <Transition name="fade">
                     <History v-if="showHistory" @close="showHistory = false"
                         :history="history"
-                        @changeChapter="changeChapter"
+                        @verseSelected="verseSelected"
                     />
                 </Transition>
                 <div class="flex h-16 items-center justify-between">
@@ -160,6 +160,7 @@ import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
 import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
+import dayjs from 'dayjs'
 import { onMounted, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
@@ -280,14 +281,19 @@ const updateLastLocation = () => {
     localStorage.setItem('lastLocation', JSON.stringify(lastLocation.value))
 }
 
-const updateHistory = () => {
-    if (history.value.length > 0 && history.value[0].bookId === bookId.value && history.value[0].chapter === chapter.value) {
+const updateHistory = (verse) => {
+    // check to see if same verse has been added in the last 5 minutes
+    let lastVerse = history.value.find(v => v.bookId === bookId.value && v.chapter === chapter.value && v.verse === verse)
+    if (lastVerse && dayjs().diff(dayjs(lastVerse.timestamp), 'minute') < 5) {
         return
     }
+
     history.value.unshift({
-        bookId: bookId.value,
+        bookId: parseInt(bookId.value),
         book: book.value,
-        chapter: chapter.value
+        chapter: chapter.value,
+        timestamp: new Date().toISOString(),
+        verse: verse
     })
     // save history to local storage
     localStorage.setItem('history', JSON.stringify(history.value.slice(0, 100)))
@@ -319,6 +325,8 @@ const highlightSelectedVerses = (color) => {
 
 const selectVerse = (verseId) => {
     // if holding shift key, select verses between last selected verse and current verse
+    updateHistory(parseInt(String(verseId).slice(-3)))
+
     if (event.shiftKey && selectedVerses.value.length > 0) {
         let lastSelectedVerse = selectedVerses.value[selectedVerses.value.length - 1]
         let lastSelectedVerseIndex = verses.value.findIndex(v => v.ID === lastSelectedVerse)
@@ -339,10 +347,11 @@ const verseSelected = (verse) => {
     bookId.value = verse.bookId
     book.value = verse.book
     chapter.value = verse.chapter
-    getVerses(parseInt(`${verse.bookId}${String(verse.chapter).padStart(3, '0')}${String(verse.verse).padStart(3, '0')}`))
+    var verseId = parseInt(`${verse.bookId}${String(verse.chapter).padStart(3, '0')}${String(verse.verse).padStart(3, '0')}`)
+    getVerses(verseId)
     showVersePicker.value = false
     showSearch.value = false
-    updateHistory()
+    updateHistory(verse.verse)
 }
 
 const searchClosed = () => {

@@ -69,23 +69,10 @@ const props = defineProps({
     background-color: #664dd9c2;
 }
 .presented {
-  animation: glow 3s ease-in-out;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
 }
 
-@-webkit-keyframes glow {
-  0% {
-    text-shadow: 0 0 0px ##00000000;
-  }
-  25% {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
-  }
-  60% {
-    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
-  }
-  100% {
-    text-shadow: 0 0 0px ##00000000;
-  }
-}
 .selected :deep(.content)  {
     text-decoration: dotted;
     text-decoration-line: underline;

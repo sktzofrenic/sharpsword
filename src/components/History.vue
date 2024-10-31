@@ -18,7 +18,8 @@
                                 <tbody class="divide-y divide-slate-800">
                                     <tr v-for="item in history" @click="goBack(item)">
                                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-lg font-medium text-white sm:pl-0 cursor-pointer" >
-                                            {{item.book}} {{item.chapter}}
+                                            {{item.book}} {{item.chapter}}:{{item.verse}}
+                                            <div class="text-xs text-slate-500">{{formatDate(item.timestamp, 'l LTS')}}</div>
                                         </td>
                                         <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                             <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-800">
@@ -43,8 +44,9 @@
 <script setup>
 import {ref} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
+import { formatDate } from '@/assets/js/dateFormat.js'
 
-const emits = defineEmits(['close', 'changeChapter'])
+const emits = defineEmits(['close', 'verseSelected'])
 const props = defineProps({
     history: {
         type: Array,
@@ -52,10 +54,13 @@ const props = defineProps({
     }
 })
 
+
 const goBack = (item) => {
-    emits('changeChapter', {
+    emits('verseSelected', {
         bookId: item.bookId,
-        chapter: item.chapter
+        book: item.book,
+        chapter: item.chapter,
+        verse: item.verse   
     })
 }
 

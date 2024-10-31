@@ -10,11 +10,22 @@ import (
     "sharpsword/go/api/bible"
     "sharpsword/go/api/search"
     "sharpsword/go/settings"
+    "sharpsword/go/database"
     "github.com/goccy/go-json"
+    "os"
 )
 
 func main() {
     settings := settings.GetSettings()
+
+    db, err := database.ConnectPool()
+
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+        os.Exit(1)
+    }
+
+    defer db.Close()
 
     app := fiber.New(fiber.Config{
         JSONEncoder: json.Marshal,
@@ -26,8 +37,8 @@ func main() {
 
     app.Get("/*", static.New(("./public")))
 
-    bible.Register(app)
-    search.Register(app)
+    bible.Register(app, db)
+    search.Register(app, db)
 
     fmt.Println("Server is running on port " + settings.Port)
 
