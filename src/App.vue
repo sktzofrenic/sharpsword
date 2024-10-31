@@ -37,10 +37,6 @@
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-text-size"></i>
                         </button>
-                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showSearch = true">
-                            <span class="absolute -inset-0.5"></span>
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
                         <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800" aria-controls="mobile-menu" aria-expanded="false" @click="showAbout = true">
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-sharp-duotone fa-solid fa-book-bible mr-1"></i> KJV
