@@ -93,7 +93,7 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
             left join paragraphs on verses.verse_id = paragraphs.verse_id and paragraphs.version = $1
         WHERE verses.version = $1 
         AND verses.verse_id >= (SELECT coalesce(max(verses.verse_id), 0) FROM verses WHERE version = $1 and verse_id < $2 - 1)
-        AND verses.verse_id <= (SELECT min(verses.verse_id) FROM verses WHERE version = $1 and verse_id > $2 + 999)
+        AND verses.verse_id <= (SELECT coalesce(min(verses.verse_id), 66999999) FROM verses WHERE version = $1 and verse_id > $2 + 999)
         ORDER BY verses.verse_id ASC;
         `
         verseId := (book_num * 1000000) + (chapter_num * 1000)
