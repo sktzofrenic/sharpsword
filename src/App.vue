@@ -283,7 +283,7 @@ const updateLastLocation = () => {
 
 const updateHistory = (verse) => {
     // check to see if same verse has been added in the last 5 minutes
-    let lastVerse = history.value.find(v => v.bookId === bookId.value && v.chapter === chapter.value && v.verse === verse)
+    let lastVerse = history.value.find(v => v.bookId === parseInt(bookId.value) && v.chapter === chapter.value && v.verse === verse)
     if (lastVerse && dayjs().diff(dayjs(lastVerse.timestamp), 'minute') < 5) {
         return
     }
