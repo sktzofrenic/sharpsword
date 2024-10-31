@@ -69,6 +69,7 @@ const props = defineProps({
     background-color: #664dd9c2;
 }
 .presented {
+    transform: translateZ(0);
     transition: all 0.3s ease;
     text-shadow: 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
 }
