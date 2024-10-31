@@ -394,7 +394,9 @@ const getVerses = async (verseId) => {
         if (!((response.data.v[0].BID === response.data.v[1].BID) && (response.data.v[0].C === response.data.v[1].C))) {
             response.data.v.shift()
         } 
-        response.data.v.pop()
+        if (!((response.data.v[response.data.v.length - 1].BID === response.data.v[response.data.v.length - 2].BID) && (response.data.v[response.data.v.length - 1].C === response.data.v[response.data.v.length - 2].C))) {
+            response.data.v.pop()
+        }
 
         verses.value = response.data.v
         bookId.value = response.data.v[0].BID
