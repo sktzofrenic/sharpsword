@@ -10,13 +10,25 @@
                 </button>
             </div>
 
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-6 text-center">
+                            <div class="my-2">
+                                <div class="relative">
+                                    <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">
+                                        Keyword Search
+                                    </label>
+                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Anything..." v-model="searchTerm" ref="search" @click="focusAndSelect">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             <div class="text-slate-100">
                 <div class="mt-2 flow-root">
                     <div class="-mx-4 -my-2 overflow-x-auto max-h-[60vh]">
                         <div class="inline-block min-w-full align-middle sm:px-6 lg:px-8">
                             <table class="min-w-full divide-y divide-slate-700">
                                 <tbody class="divide-y divide-slate-800">
-                                    <tr v-for="item in highlights" @click="goBack(item)">
+                                    <tr v-for="item in filteredHighlights" @click="goBack(item)">
                                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-lg font-medium text-white sm:pl-0 cursor-pointer" >
                                             <span :class="[item.color]">
                                                 {{item.book}} {{item.chapter}}:{{item.verse}}
@@ -44,7 +56,7 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
 import { formatDate } from '@/assets/js/dateFormat.js'
 
@@ -56,7 +68,14 @@ const props = defineProps({
     }
 })
 
+const searchTerm = ref('')
+
 // Add computed filtered highlights
+const filteredHighlights = computed(() => {
+    return props.highlights.filter(item => {
+        return `${item.book} ${item.chapter}:${item.verse}`.toLowerCase().includes(searchTerm.value.toLowerCase()) && item.book
+    })
+})
 
 const goBack = (item) => {
     emits('verseSelected', {

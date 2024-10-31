@@ -319,7 +319,7 @@ const highlightSelectedVerses = (color) => {
 
         var verseData =  verses.value.find(v => v.ID === verseId)
 
-        highlightedVerses.value.push({
+        highlightedVerses.value.unshift({
             verseId: verseId,
             color: color,
             book: verseData.B,
