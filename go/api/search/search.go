@@ -2,37 +2,47 @@ package search
 
 import (
     "github.com/gofiber/fiber/v3"
-    "sharpsword/go/database"
     "sharpsword/go/models"
+    "github.com/jackc/pgx/v5/pgxpool"
     "fmt"
     "os"
     "context"
     "strings"
 )
 
-func Register(app *fiber.App) {
+func Register(app *fiber.App, conn *pgxpool.Pool) {
     app.Get("/api/v1/bible/:version/search", func(c fiber.Ctx) error {
 
         searchTerm := c.Query("q")
         version := strings.ToUpper(c.Params("version"))
 
-        conn, err := database.Connect()
+        count := 0
+        count_query := `
+            SELECT count(*)
+                FROM verses,
+                    plainto_tsquery('english_nostop', $1) q
 
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-            os.Exit(1)
-        }
+                WHERE verses.ts_vec @@ q
+                    and verses.version = $2;
+        `
 
-        defer conn.Close(context.Background())
+        err := conn.QueryRow(context.Background(), count_query, searchTerm, version).Scan(&count)
 
         query := `
                 SELECT
-                verse_id, b.book_name, b.testament, b.book_id, chapter, verse, ts_headline(text_plain, q, 'MinWords=40,MaxWords=50'), rank as result_rank
+                    verse_id,
+                    b.book_name,
+                    b.testament,
+                    b.book_id,
+                    chapter,
+                    verse,
+                    ts_headline('english_nostop', text_plain, q, 'MinWords=40,MaxWords=50'),
+                    rank as result_rank
                 FROM (
                 SELECT
                     verse_id, book, chapter, verse, text_plain, ts_rank(ts_vec, q) as rank, q
                 FROM
-                    verses, plainto_tsquery($1) q
+                    verses, plainto_tsquery('english_nostop', $1) q
 
                 WHERE
                     verses.ts_vec @@ q
@@ -70,6 +80,7 @@ func Register(app *fiber.App) {
 
         return c.JSON(fiber.Map{
             "r": rowSlice,
+            "c": count,
         })
     })
 }

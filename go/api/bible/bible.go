@@ -2,7 +2,7 @@ package bible
 
 import (
     "github.com/gofiber/fiber/v3"
-    "sharpsword/go/database"
+    "github.com/jackc/pgx/v5/pgxpool"
     "sharpsword/go/models"
     "strconv"
     "fmt"
@@ -11,17 +11,9 @@ import (
     "strings"
 )
 
-func Register(app *fiber.App) {
+func Register(app *fiber.App, conn *pgxpool.Pool) {
 
     app.Get("/api/v1/bible/:version", func(c fiber.Ctx) error {
-        conn, err := database.Connect()
-
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-            os.Exit(1)
-        }
-
-        defer conn.Close(context.Background())
 
         query := `
             SELECT
@@ -65,7 +57,11 @@ func Register(app *fiber.App) {
             ) books
         `
         var json_data string
-        err = conn.QueryRow(context.Background(), query).Scan(&json_data)
+        err := conn.QueryRow(context.Background(), query).Scan(&json_data)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+            os.Exit(1)
+        }
 
         return c.SendString(
             fmt.Sprintf("%s", json_data),
@@ -80,15 +76,6 @@ func Register(app *fiber.App) {
 
         chapter := c.Params("chapter")
         chapter_num, err := strconv.Atoi(chapter)
-
-        conn, err := database.Connect()
-
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-            os.Exit(1)
-        }
-
-        defer conn.Close(context.Background())
 
         query := `SELECT 
             text_formatted,
