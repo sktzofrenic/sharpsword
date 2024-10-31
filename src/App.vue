@@ -21,6 +21,12 @@
                         @verseSelected="verseSelected"
                     />
                 </Transition>
+                <Transition name="fade">
+                    <Highlights v-if="showHighlights" @close="showHighlights = false"
+                        :highlights="highlightedVerses"
+                        @verseSelected="verseSelected"
+                    />
+                </Transition>
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -139,7 +145,7 @@
                         <i class="fa-solid fa-magnifying-glass text-xl block"></i>
                         <span class="text-xs">Search</span>
                     </div>
-                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer">
+                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer" @click="showHighlights = true">
                         <i class="fa-sharp-duotone fa-solid fa-highlighter-line text-xl block"></i>
                         <span class="text-xs">Highlights</span>
                     </div>
@@ -154,6 +160,7 @@ import Verse from '@/components/Verse.vue'
 import VersePicker from '@/components/VersePicker.vue'
 import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
+import Highlights from '@/components/Highlights.vue'
 import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
 import dayjs from 'dayjs'
@@ -169,6 +176,7 @@ const store = useAppStore()
 const showReadingSettings = ref(false)
 const showAbout = ref(false)
 const showHistory = ref(false)
+const showHighlights = ref(false)
 const chapter = ref(1)
 const book = ref('')
 const bookId = ref(1)
@@ -309,9 +317,16 @@ const highlightSelectedVerses = (color) => {
     selectedVerses.value.forEach(verseId => {
         highlightedVerses.value = highlightedVerses.value.filter(v => v.verseId !== verseId)
 
+        var verseData =  verses.value.find(v => v.ID === verseId)
+
         highlightedVerses.value.push({
             verseId: verseId,
-            color: color
+            color: color,
+            book: verseData.B,
+            bookId: verseData.BID,
+            timestamp: new Date().toISOString(),
+            chapter: verseData.C,
+            verse: parseInt(String(verseId).slice(-3)),
         })
     })
     selectedVerses.value = []
@@ -347,6 +362,8 @@ const verseSelected = (verse) => {
     getVerses(verseId)
     showVersePicker.value = false
     showSearch.value = false
+    showHistory.value = false
+    showHighlights.value = false
     updateHistory(verse.verse)
 }
 
