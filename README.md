@@ -6,6 +6,16 @@ Goals include high performance search (equivalent or faster to native desktop ap
 
 Live Implementation: [https://sharpsword.io](https://sharpsword.io)
 
+## Goals
+
+- Fast search with results returned with each keystroke
+- Fast navigation using keyboard to any book/chapter/verse
+- Mobile first Progressive Web App (PWA) design with responsive layout for desktop
+- Verse highlighting and verse selections with sharing options
+- Data export and import for easy transition to self hosting
+
+![SharpSword](https://sharpsword.io/assets/sword_zoom_sq_512-BZyze98q.png)
+
 ## Performance
 
 For these tests, the Go webserver running on a 2 CPU (shared), 4 GB RAM linode instance. 
@@ -17,17 +27,6 @@ The data below simulates 20,000 searches through the full Bible text for the wor
 ![image](https://github.com/user-attachments/assets/8171b2fc-01c6-4333-a267-d195cb9be7f5)
 
 *The goal is to host this application free forever.* Please consider supporting the project by [donating](https://venmo.com/DanSafee).
-
-## Goals
-
-- Fast search with results returned with each keystroke
-- Fast navigation using keyboard to any book/chapter/verse
-- Mobile first Progressive Web App (PWA) design with responsive layout for desktop
-- Amazing Copy/Paste support with customizable formatting
-- Verse highlighting and verse selections with sharing options
-- Data export and import for easy transition to self hosting
-
-![SharpSword](https://sharpsword.io/assets/sword_zoom_sq_512-BZyze98q.png)
 
 ## Setup
 
