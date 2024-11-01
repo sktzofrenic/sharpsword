@@ -17,6 +17,59 @@
                     <dd class="mt-2 text-base/7 text-slate-400 pt-2">
                         Live implementation of the app is available at <a href="https://sharpsword.io" target="_blank" class="text-slate-200 hover:text-slate-100">SharpSword.io</a> and is hosted for free, please consider a donation on our GitHub page. You can download and run your own copy as well.
                     </dd>
+                    <dd class="mt-2 text-base/7 text-slate-400 pt-2">
+                        Download your history, highlights, and plan data.
+
+                        <Transition name="slide-fade">
+                            <div v-if="msg" class="bg-slate-900 text-red-200 p-4 my-2 rounded-lg">
+                                {{msg}}
+                            </div>
+                        </Transition>
+
+                        <div class="flex justify-between mt-2">
+                            <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-900"
+                                @click="downloadHistory"
+                            >
+                                <i class="fa-solid fa-download"></i> History
+                            </button>
+                            <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-900"
+                                @click="downloadHighlights"
+                            >
+                                <i class="fa-solid fa-download"></i> Highlights
+                            </button>
+                            <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-900"
+                                @click="downloadPlans"
+                            >
+                                <i class="fa-solid fa-download"></i> Plans
+                            </button>
+                        </div>
+                    </dd>
+                    <dd class="mt-2 text-base/7 text-slate-400 pt-2">
+                        <p class="text-slate-200">Import data. Select whether you want to merge with your existing data or replace it. </p>
+                        <div class="bg-slate-800 py-2 rounded-lg">
+                            <div class="flex justify-between">
+                                <label class="cursor-pointer flex-1 text-center p-2 rounded-lg transition-colors duration-300" :class="{'bg-slate-600 text-white': selected === 'merge', 'text-slate-600': selected !== 'merge'}" @click="selected = 'merge'">
+                                    <input type="radio" name="action" value="merge" class="hidden" />
+                                    Merge
+                                </label>
+                                <label class="cursor-pointer flex-1 text-center p-2 rounded-lg transition-colors duration-300" :class="{'bg-slate-600 text-white': selected === 'replace', 'text-slate-600': selected !== 'replace'}" @click="selected = 'replace'">
+                                    <input type="radio" name="action" value="replace" class="hidden" />
+                                    Replace
+                                </label>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800 py-2 rounded-lg">
+                            <label class="flex items-center justify-center w-full bg-slate-600 text-white p-2 rounded-lg cursor-pointer hover:bg-slate-500 transition-colors duration-300">
+                                <span class="text-slate-400">Choose File</span>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    ref="file"
+                                    @change="importData"
+                                />
+                            </label>
+                        </div>
+                    </dd>
                 </div>
             </div>
         </div>
@@ -27,13 +80,151 @@
 import {ref} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
 
-const emits = defineEmits(['close'])
+const emits = defineEmits(['close', 'importData'])
 
 const close = () => {
     emits('close')
 }
 
 const store = useAppStore()
+const msg = ref('')
+const selected = ref('merge')
+
+const flash = (message) => {
+    msg.value = message
+    setTimeout(() => {
+        msg.value = ''
+    }, 3000)
+}
+
+const importData = (e) => {
+    console.log(e.target.files)
+    const file = e.target.files[0]
+    if (!file) {
+        flash('No file selected')
+        return
+    }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        const data = JSON.parse(e.target.result)
+        console.log(data)
+        if (!data.type) {
+            flash('Invalid data')
+            return
+        }
+
+        if (data.type === 'history') {
+            importHistory({
+                history: data.history,
+                option: selected.value
+            })
+        } else if (data.type === 'highlight') {
+            importHighlights({
+                highlights: data.highlights,
+                option: selected.value
+            })
+        } else if (data.type === 'plan') {
+            importPlans({
+                plans: data.plans,
+                option: selected.value
+            })
+        } else {
+            flash('Invalid data')
+            return
+        }
+    }
+    reader.readAsText(file)
+    // clear the file input
+    e.target.value = ''
+}
+
+const importHistory = (options) => {
+    if (options.option === 'merge') {
+        const history = JSON.parse(localStorage.getItem('history'))
+        if (!history) {
+            localStorage.setItem('history', JSON.stringify(options.history))
+        } else {
+            history.push(...options.history)
+            // sort history by timestamp
+            history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+            localStorage.setItem('history', JSON.stringify(history))
+        }
+    } else {
+        localStorage.setItem('history', JSON.stringify(options.history))
+    }
+    flash('History imported')
+    emits('importData')
+}
+
+const importHighlights = (options) => {
+    if (options.option === 'merge') {
+        const highlights = JSON.parse(localStorage.getItem('highlightedVerses'))
+        if (!highlights) {
+            localStorage.setItem('highlightedVerses', JSON.stringify(options.highlights))
+        } else {
+            highlights.push(...options.highlights)
+            localStorage.setItem('highlightedVerses', JSON.stringify(highlights))
+        }
+    } else {
+        localStorage.setItem('highlightedVerses', JSON.stringify(options.highlights))
+    }
+    flash('Highlights imported')
+    emits('importData')
+}
+
+const downloadHistory = () => {
+    var history = localStorage.getItem('history')
+    if (!history) {
+        flash('No history to download')
+        return
+    }
+    history = {
+        timestamp: new Date(),
+        type: 'history',
+        history: JSON.parse(history)
+    }
+    var filename =  `sharpsword-history-${new Date().toISOString()}.json`
+    download(history, filename)
+}
+
+const downloadHighlights = () => {
+    var highlights = localStorage.getItem('highlightedVerses')
+    if (!highlights) {
+        flash('No highlights to download')
+        return
+    }
+    highlights = {
+        timestamp: new Date(),
+        type: 'highlight',
+        highlights: JSON.parse(highlights)
+    }
+    var filename =  `sharpsword-highlights-${new Date().toISOString()}.json`
+    download(highlights, filename)
+}
+
+const downloadPlans = () => {
+    var plans = localStorage.getItem('plans')
+    if (!plans) {
+        flash('No plans to download')
+        return
+    }
+    plans = {
+        timestamp: new Date(),
+        type: 'plan',
+        plans: JSON.parse(plans)
+    }
+    var filename =  `sharpsword-plans-${new Date().toISOString()}.json`
+    download(plans, filename)
+}
+
+const download = (data, filename) => {
+    var element = document.createElement('a')
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(data)))
+    element.setAttribute('download', filename)
+    element.style.display = 'none'
+    document.body.appendChild(element)
+    element.click()
+}
 
 const displayFontSize = (size) => {
     const sizes = {

@@ -13,7 +13,9 @@
                     <ReadingSettings v-if="showReadingSettings" @close="showReadingSettings = false" />
                 </Transition>
                 <Transition name="fade">
-                    <About v-if="showAbout" @close="showAbout = false" />
+                    <About 
+                        @importData="importData"
+                        v-if="showAbout" @close="showAbout = false" />
                 </Transition>
                 <Transition name="fade">
                     <History v-if="showHistory" @close="showHistory = false"
@@ -199,6 +201,11 @@ const sortedSelectedVerses = computed(() => {
     return selectedVerses.value.sort((a, b) => a - b)
 })
 
+const importData = () => {
+    // refresh hisotry and highlights from local storage
+    highlightedVerses.value = JSON.parse(localStorage.getItem('highlightedVerses')) || []
+    history.value = JSON.parse(localStorage.getItem('history')) || []
+}
 // on Ctrl + C do a rich copy
 window.addEventListener('keydown', function(e) {
     if (e.key === 'c' && e.ctrlKey) {

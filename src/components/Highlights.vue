@@ -15,9 +15,9 @@
                             <div class="my-2">
                                 <div class="relative">
                                     <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">
-                                        Keyword Search
+                                    Filter by Book
                                     </label>
-                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Anything..." v-model="searchTerm" ref="search" @click="focusAndSelect">
+                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Genesis..." v-model="searchTerm" ref="search" @click="focusAndSelect">
                                 </div>
                             </div>
                         </div>
