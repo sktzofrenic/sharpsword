@@ -134,7 +134,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="flex h-16 items-center justify-between sm:grow sm:mt-2">
+                <div class="flex h-16 mb-2 items-center justify-between sm:grow sm:mt-2">
                     <div class="flex flex-col items-center text-slate-200 w-14 bg-slate-900 rounded-xl px-8 py-2 cursor-pointer">
                         <i class="fa-sharp-duotone fa-solid fa-book-bible text-xl block"></i>
                         <span class="text-xs">Bible</span>
