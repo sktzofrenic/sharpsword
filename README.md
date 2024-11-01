@@ -1,21 +1,32 @@
 # SharpSword
 
-SharpSword is a Bible web app written in Go/Vue with a focus of fast search and navigation and a customizable copy/paste function with formatting. 
+SharpSword is a Bible web app written in Go/Vue with a mobile first focus. 
+
+Goals include high performance search (equivalent or faster to native desktop application), and smooth verse navigation. 
 
 Live Implementation: [https://sharpsword.io](https://sharpsword.io)
-
-*The goal is to host this application free forever.* Please consider supporting the project by [donating](https://venmo.com/DanSafee).
 
 ## Goals
 
 - Fast search with results returned with each keystroke
 - Fast navigation using keyboard to any book/chapter/verse
 - Mobile first Progressive Web App (PWA) design with responsive layout for desktop
-- Amazing Copy/Paste support with customizable formatting
 - Verse highlighting and verse selections with sharing options
 - Data export and import for easy transition to self hosting
 
 ![SharpSword](https://sharpsword.io/assets/sword_zoom_sq_512-BZyze98q.png)
+
+## Performance
+
+For these tests, the Go webserver running on a 2 CPU (shared), 4 GB RAM linode instance. 
+
+The data below simulates retrieving a chapter 20,000 times at a concurrency of 100 requests. 
+![image](https://github.com/user-attachments/assets/b24df99e-45a5-4b90-bc09-23afab310e94)
+
+The data below simulates 20,000 searches through the full Bible text for the word "Jesus" at a concurrency of 100 requests.
+![image](https://github.com/user-attachments/assets/8171b2fc-01c6-4333-a267-d195cb9be7f5)
+
+*The goal is to host this application free forever.* Please consider supporting the project by [donating](https://venmo.com/DanSafee).
 
 ## Setup
 
