@@ -152,17 +152,15 @@
                         <span class="text-xs">Highlights</span>
                     </div>
                 </div>
-                <div class="hidden sm:flex sm:items-center sm:justify-center sm:grow sm:invisible">
+                <div class="hidden sm:flex sm:items-center sm:justify-center sm:grow">
                     <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
-                        <span class="cursor-pointer" @click="changeChapter(prevChapter)">
-                            <i class="fa-solid fa-left text-xl px-4 text-slate-500"></i>
-                        </span>
-                        <span class="font-bold py-1 w-1/2 cursor-pointer" @click="showVersePicker = true">
-                            {{ book }} {{ chapter }}
-                        </span>
-                        <span class="cursor-pointer" @click="changeChapter(nextChapter)">
-                            <i class="fa-solid fa-right text-xl px-4 text-slate-500"></i>
-                        </span>
+                        <!-- input field for verse selection -->
+                        <input 
+                            type="text" 
+                            class="bg-slate-900 text-slate-200 border-slate-700 focus:border-slate-500 rounded-lg py-1 px-2 w-full mx-2 focus:outline-none focus:ring-0 focus:ring-slate-800" 
+                            placeholder="Genesis 1:1 / 1jn2 / rev 3 / 2sam 8:12 / + enter..." 
+                            v-model="reference"
+                            @keydown.enter="textSearch">
                     </div>
                 </div>
             </div>
@@ -175,6 +173,7 @@ import Verse from '@/components/Verse.vue'
 import VersePicker from '@/components/VersePicker.vue'
 import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
+import books from '@/assets/bible/books.json'
 import Highlights from '@/components/Highlights.vue'
 import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
@@ -207,6 +206,62 @@ const lastLocation = ref({})
 
 const prevChapter = ref({})
 const nextChapter = ref({})
+const reference = ref('')
+
+// on left and right arrow key press, change chapter
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft') {
+        changeChapter(prevChapter.value)
+    }
+})
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') {
+        changeChapter(nextChapter.value)
+    }
+})
+
+const textSearch = (event) => {
+    // first find all numbers in the beginning of the string
+    let bookName = reference.value.match(/[a-zA-Z]+/g)
+    let parts = reference.value.split(bookName)
+    let foundChapter, verse, bookOrdinal, chapterVerse
+
+    if (parts.length === 1) {
+        bookOrdinal = null
+        chapterVerse = parts[0].split(':')
+        if (chapterVerse.length === 1) {
+            foundChapter = chapterVerse[0].trim()
+            verse = null
+        } else {
+            foundChapter = chapterVerse[0].trim()
+            verse = chapterVerse[1].trim()
+        }
+    } else {
+        bookOrdinal = parts[0].trim()
+        chapterVerse = parts[1].split(':')
+        if (chapterVerse.length === 1) {
+            foundChapter = chapterVerse[0].trim()
+            verse = null
+        } else {
+            foundChapter = chapterVerse[0].trim()
+            verse = chapterVerse[1].trim()
+        }
+    }
+    // search for book ID in books.json
+    bookName = `${bookOrdinal ? bookOrdinal + ' ' : ''}${bookName}`
+    let bookAbbreviation = `${bookOrdinal ? bookOrdinal + ' ' : ''}${bookName.slice(0, 3)}`
+    let bookData = books.find(b => b.bookName.toLowerCase().includes(bookName.toLowerCase()) || b.bookAbbreviation.toLowerCase().includes(bookAbbreviation.toLowerCase()))
+    if (bookData) {
+        bookId.value = bookData.id
+        book.value = bookData.name
+        chapter.value = parseInt(foundChapter)
+        var verseId = parseInt(`${bookId.value}${String(chapter.value).padStart(3, '0')}${String(verse).padStart(3, '0')}`)
+        console.log(verseId)
+        getVerses(verseId)
+        
+    }
+    reference.value = ''
+}
 
 
 //computed sorted selected verses
