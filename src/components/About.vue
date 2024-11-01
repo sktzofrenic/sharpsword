@@ -26,7 +26,7 @@
                             </div>
                         </Transition>
 
-                        <div class="flex justify-between mt-2">
+                        <div class="flex justify-between mt-2 gap-2">
                             <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-900"
                                 @click="downloadHistory"
                             >
