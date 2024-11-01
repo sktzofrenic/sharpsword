@@ -117,11 +117,6 @@ watch(searchTerm, () => {
 const results = ref([])
 
 const search = async () => {
-    if (searchTerm.value.length < 2) {
-        results.value = []
-        return
-    }
-
     try {
         const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/search?q=${searchTerm.value}`)
         results.value = response.data.r
