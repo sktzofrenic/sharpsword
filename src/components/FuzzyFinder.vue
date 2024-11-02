@@ -44,13 +44,13 @@ const textSearch = (event) => {
 
     if (bookData) {
         bookId.value = bookData.bookId
-        book.value = bookData.name
+        book.value = bookData.bookName
     } else {
         // look for a book in bookData that includes the same letters of bookName in any order
         let fuzzyBook = books.find(b => bookName.toLowerCase().split('').every(letter => b.bookName.toLowerCase().includes(letter)))
         if (fuzzyBook) {
             bookId.value = fuzzyBook.bookId
-            book.value = fuzzyBook.name
+            book.value = fuzzyBook.bookName
         }
     }
 
