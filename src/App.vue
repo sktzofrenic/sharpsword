@@ -1,4 +1,3 @@
-
 <template>
     <Transition name="fade">
         <Search @close="searchClosed" v-show="showSearch" @verseSelected="verseSelected" :visible="showSearch" />
@@ -35,7 +34,7 @@
                             <img class="h-16 w-16 border-r border-b border-slate-700 rounded-md" src="@/assets/sword_zoom_sq_512.png" alt="Your Company">
                         </div>
                     </div>
-                    <div class="-mr-2 flex">
+                    <div class="-mr-2m flex">
                         <!-- Mobile menu button -->
                         <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 mr-2" aria-controls="mobile-menu" aria-expanded="false" @click="showHistory = !showHistory">
                             <span class="absolute -inset-0.5"></span>
@@ -155,12 +154,7 @@
                 <div class="hidden sm:flex sm:items-center sm:justify-center sm:grow">
                     <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
                         <!-- input field for verse selection -->
-                        <input 
-                            type="text" 
-                            class="bg-slate-900 text-slate-200 border-slate-700 focus:border-slate-500 rounded-lg py-1 px-2 w-full mx-2 focus:outline-none focus:ring-0 focus:ring-slate-800" 
-                            placeholder="Genesis 1:1 / 1jn2 / rev 3 / 2sam 8:12 / + enter..." 
-                            v-model="reference"
-                            @keydown.enter="textSearch">
+                        <FuzzyFinder @verseSelected="verseSelected" />
                     </div>
                 </div>
             </div>
@@ -173,8 +167,8 @@ import Verse from '@/components/Verse.vue'
 import VersePicker from '@/components/VersePicker.vue'
 import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
-import books from '@/assets/bible/books.json'
 import Highlights from '@/components/Highlights.vue'
+import FuzzyFinder from '@/components/FuzzyFinder.vue'
 import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
 import dayjs from 'dayjs'
@@ -220,48 +214,6 @@ window.addEventListener('keydown', function(e) {
     }
 })
 
-const textSearch = (event) => {
-    // first find all numbers in the beginning of the string
-    let bookName = reference.value.match(/[a-zA-Z]+/g)
-    let parts = reference.value.split(bookName)
-    let foundChapter, verse, bookOrdinal, chapterVerse
-
-    if (parts.length === 1) {
-        bookOrdinal = null
-        chapterVerse = parts[0].split(':')
-        if (chapterVerse.length === 1) {
-            foundChapter = chapterVerse[0].trim()
-            verse = null
-        } else {
-            foundChapter = chapterVerse[0].trim()
-            verse = chapterVerse[1].trim()
-        }
-    } else {
-        bookOrdinal = parts[0].trim()
-        chapterVerse = parts[1].split(':')
-        if (chapterVerse.length === 1) {
-            foundChapter = chapterVerse[0].trim()
-            verse = null
-        } else {
-            foundChapter = chapterVerse[0].trim()
-            verse = chapterVerse[1].trim()
-        }
-    }
-    // search for book ID in books.json
-    bookName = `${bookOrdinal ? bookOrdinal + ' ' : ''}${bookName}`
-    let bookAbbreviation = `${bookOrdinal ? bookOrdinal + ' ' : ''}${bookName.slice(0, 3)}`
-    let bookData = books.find(b => b.bookName.toLowerCase().includes(bookName.toLowerCase()) || b.bookAbbreviation.toLowerCase().includes(bookAbbreviation.toLowerCase()))
-    if (bookData) {
-        bookId.value = bookData.id
-        book.value = bookData.name
-        chapter.value = parseInt(foundChapter)
-        var verseId = parseInt(`${bookId.value}${String(chapter.value).padStart(3, '0')}${String(verse).padStart(3, '0')}`)
-        console.log(verseId)
-        getVerses(verseId)
-        
-    }
-    reference.value = ''
-}
 
 
 //computed sorted selected verses

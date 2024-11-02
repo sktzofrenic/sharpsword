@@ -839,6 +839,18 @@ select {
   top: 5rem;
 }
 
+.left-8 {
+  left: 2rem;
+}
+
+.left-4 {
+  left: 1rem;
+}
+
+.-top-2 {
+  top: -0.5rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -1358,6 +1370,14 @@ select {
 
 .pt-5 {
   padding-top: 1.25rem;
+}
+
+.pr-8 {
+  padding-right: 2rem;
+}
+
+.pr-6 {
+  padding-right: 1.5rem;
 }
 
 .text-left {
