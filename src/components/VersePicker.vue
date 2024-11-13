@@ -17,7 +17,7 @@
                             <div class="mt-2">
                                 <div class="relative">
                                     <label for="name" class="absolute -top-3 left-2 inline-block bg-slate-900 px-1 text-xs font-medium text-slate-100 rounded-md">Filter</label>
-                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Book name..." v-model="searchTerm">
+                                    <input type="text" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6" placeholder="Book name..." v-model="searchTerm" ref="search" @click="focusAndSelect">
                                 </div>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                                     @click="selectBook(book)"
                                     v-for="(book, index) in otBooks">{{book.n}}</div>
                             </div>
-                            <div class="relative my-4" v-if="ntBooks.length > 0">
+                            <div class="relative my-4" v-if="ntBooks.length > 0 && otBooks.length > 0">
                                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
                                     <div class="w-full border-t border-slate-300"></div>
                                 </div>
@@ -85,16 +85,18 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, useTemplateRef } from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import http from '@/http'
 
 const emits = defineEmits(['close', 'verseSelected'])
+const props = defineProps(['visible'])
 const baseUrl = useBaseUrlStore()
 const bibleData = ref({ b: [] })
 const selectedBook = ref(null)
 const selectedChapter = ref(null)
 const searchTerm = ref('')
+const searchElement = useTemplateRef('search')
 
 const close = () => {
     emits('close')
@@ -107,6 +109,12 @@ const goBack = () => {
         selectedBook.value = null
     }
 }
+
+const focusAndSelect = () => {
+    searchElement.value.focus()
+    searchElement.value.select()
+}
+
 
 const selectVerse = (verse) => {
     emits('verseSelected', {
@@ -160,6 +168,7 @@ const getBibleData = async () => {
 
 onMounted(() => {
     getBibleData()
+    focusAndSelect()
 })
 
 
