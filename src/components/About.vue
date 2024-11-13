@@ -98,7 +98,6 @@ const flash = (message) => {
 }
 
 const importData = (e) => {
-    console.log(e.target.files)
     const file = e.target.files[0]
     if (!file) {
         flash('No file selected')
@@ -107,7 +106,6 @@ const importData = (e) => {
     const reader = new FileReader()
     reader.onload = (e) => {
         const data = JSON.parse(e.target.result)
-        console.log(data)
         if (!data.type) {
             flash('Invalid data')
             return
@@ -169,6 +167,22 @@ const importHighlights = (options) => {
         localStorage.setItem('highlightedVerses', JSON.stringify(options.highlights))
     }
     flash('Highlights imported')
+    emits('importData')
+}
+
+const importPlans = (options) => {
+    if (options.option === 'merge') {
+        const plans = JSON.parse(localStorage.getItem('plans'))
+        if (!plans) {
+            localStorage.setItem('plans', JSON.stringify(options.plans))
+        } else {
+            highlights.push(...options.plans)
+            localStorage.setItem('plans', JSON.stringify(plans))
+        }
+    } else {
+        localStorage.setItem('plans', JSON.stringify(options.plans))
+    }
+    flash('Plans imported')
     emits('importData')
 }
 
