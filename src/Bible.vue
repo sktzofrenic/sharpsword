@@ -5,6 +5,9 @@
     <Transition name="fade">
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
     </Transition>
+    <Transition name="fade">
+        <ReadingPlans @close="plansClosed" @verseSelected="verseSelected" v-if="showPlans"/>
+    </Transition>
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4 relative">
@@ -44,7 +47,7 @@
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-solid fa-text-size"></i>
                         </button>
-                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800" aria-controls="mobile-menu" aria-expanded="false" @click="showAbout = true">
+                        <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-slate-800 py-1 px-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800" aria-controls="mobile-menu" aria-expanded="false" @click="displayAbout">
                             <span class="absolute -inset-0.5"></span>
                             <i class="fa-sharp-duotone fa-solid fa-book-bible mr-1"></i> KJV
                         </button>
@@ -138,7 +141,7 @@
                         <i class="fa-sharp-duotone fa-solid fa-book-bible text-xl block"></i>
                         <span class="text-xs">Bible</span>
                     </div>
-                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer">
+                    <div class="flex flex-col items-center text-slate-200 w-14 cursor-pointer" @click="showPlans = true">
                         <i class="fa-sharp-duotone fa-solid fa-ballot-check text-xl block"></i>
                         <span class="text-xs">Plans</span>
                     </div>
@@ -168,6 +171,7 @@ import VersePicker from '@/components/VersePicker.vue'
 import ReadingSettings from '@/components/ReadingSettings.vue'
 import History from '@/components/History.vue'
 import Highlights from '@/components/Highlights.vue'
+import ReadingPlans from '@/components/ReadingPlans.vue'
 import FuzzyFinder from '@/components/FuzzyFinder.vue'
 import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
@@ -184,6 +188,7 @@ const store = useAppStore()
 const showReadingSettings = ref(false)
 const showAbout = ref(false)
 const showHistory = ref(false)
+const showPlans = ref(false)
 const showHighlights = ref(false)
 const chapter = ref(1)
 const book = ref('')
@@ -381,6 +386,15 @@ const selectVerse = (verseId) => {
     }
 }
 
+const displayAbout = () => {
+    showAbout.value = true
+    showVersePicker.value = false
+    showSearch.value = false
+    showHistory.value = false
+    showHighlights.value = false
+    showPlans.value = false
+}
+
 const verseSelected = (verse) => {
     bookId.value = verse.bookId
     book.value = verse.book
@@ -391,11 +405,16 @@ const verseSelected = (verse) => {
     showSearch.value = false
     showHistory.value = false
     showHighlights.value = false
+    showPlans.value = false
     updateHistory(verse.verse)
 }
 
 const searchClosed = () => {
     showSearch.value = false
+}
+
+const plansClosed = () => {
+    showPlans.value = false
 }
 
 const versePickerClosed = () => {
