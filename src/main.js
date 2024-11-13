@@ -3,11 +3,11 @@ import './assets/output.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import App from './App.vue'
+import Bible from './Bible.vue'
 
 const worker = new Worker(new URL('./assets/js/service-worker.js', import.meta.url))
 
-const app = createApp(App)
+const app = createApp(Bible)
 
 app.use(createPinia())
 
