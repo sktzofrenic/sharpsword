@@ -823,6 +823,10 @@ select {
   left: 0.5rem;
 }
 
+.left-4 {
+  left: 1rem;
+}
+
 .right-0 {
   right: 0px;
 }
@@ -837,18 +841,6 @@ select {
 
 .top-20 {
   top: 5rem;
-}
-
-.left-8 {
-  left: 2rem;
-}
-
-.left-4 {
-  left: 1rem;
-}
-
-.-top-2 {
-  top: -0.5rem;
 }
 
 .z-10 {
@@ -891,10 +883,6 @@ select {
 
 .-ml-1 {
   margin-left: -0.25rem;
-}
-
-.-mr-2 {
-  margin-right: -0.5rem;
 }
 
 .-mt-10 {
@@ -1370,14 +1358,6 @@ select {
 
 .pt-5 {
   padding-top: 1.25rem;
-}
-
-.pr-8 {
-  padding-right: 2rem;
-}
-
-.pr-6 {
-  padding-right: 1.5rem;
 }
 
 .text-left {
