@@ -5,7 +5,7 @@
             "title": "365 Day Chronological Bible Reading Plan",
             "description": "Read through the Bible in chronological order with this plan.",
             "image": "base64",
-            "startDate": null,
+            "startDate": "2024-11-14",
             "days": [
                 {
                     "day": 1,

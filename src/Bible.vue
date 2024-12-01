@@ -6,7 +6,7 @@
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
     </Transition>
     <Transition name="fade">
-        <ReadingPlans @close="plansClosed" @verseSelected="verseSelected" v-if="showPlans"/>
+        <ReadingPlans :plans="plans" @close="plansClosed" @verseSelected="verseSelected" v-if="showPlans"/>
     </Transition>
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
@@ -200,6 +200,7 @@ const showSearch = ref(false)
 const presentedVerses = ref([])
 const selectedVerses = ref([])
 const highlightedVerses = ref([])
+const plans = ref([])
 const history = ref([])
 const lastLocation = ref({})
 
@@ -498,6 +499,8 @@ onMounted(async () => {
     history.value = JSON.parse(localStorage.getItem('history')) || []
     // get last location from local storage
     lastLocation.value = JSON.parse(localStorage.getItem('lastLocation')) || {}
+
+    plans.value = JSON.parse(localStorage.getItem('plans')) || []
 
     if (lastLocation.value.bookId && lastLocation.value.chapter) {
         bookId.value = lastLocation.value.bookId
