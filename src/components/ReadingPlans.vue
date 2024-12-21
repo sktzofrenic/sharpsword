@@ -29,6 +29,18 @@
                         <div class="mt-2 flow-root">
                             <div class="-mx-4 -my-2 overflow-x-auto h-[70vh]">
                                 <div class="inline-block min-w-full align-middle px-6" v-if="activePlan">
+                                    <div class="flex flex-row flex-nowrap gap-2">
+                                        <div v-for="day in activePlan.days">
+                                            <div class="text-lg text-slate-100 rounded-md bg-slate-800 flex flex-col items-center px-4 py-2">
+                                                <div class="">
+                                                    {{ day.day }}
+                                                </div>
+                                                <div class="text-xs text-nowrap">
+                                                    Dec 20
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="inline-block min-w-full align-middle px-6" v-else>
                                     <div v-for="plan in plans">
