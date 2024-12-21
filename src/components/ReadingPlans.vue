@@ -27,16 +27,42 @@
                     </div>
                     <div class="text-slate-100">
                         <div class="mt-2 flow-root">
-                            <div class="-mx-4 -my-2 overflow-x-auto h-[70vh]">
+                            <div class="-mx-4 -my-2  h-[70vh]">
                                 <div class="inline-block min-w-full align-middle px-6" v-if="activePlan">
-                                    <div class="flex flex-row flex-nowrap gap-2">
+                                    <div class="flex flex-row flex-nowrap gap-2 mt-2 overflow-x-auto max-w-[90%] pb-2">
                                         <div v-for="day in activePlan.days">
-                                            <div class="text-lg text-slate-100 rounded-md bg-slate-800 flex flex-col items-center px-4 py-2">
+                                            <div class="text-lg text-slate-100 rounded-md bg-slate-800 flex flex-col items-center px-4 py-2"
+                                                :class="{'bg-slate-400': activeDay?.day === day.day}"
+                                              @click="selectDay(day)"
+                                            >
                                                 <div class="">
                                                     {{ day.day }}
                                                 </div>
                                                 <div class="text-xs text-nowrap">
                                                     Dec 20
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4" v-if="activeDay">
+                                        <div class="text-lg text-slate-100">
+                                            Day {{ activeDay.day }} of {{ activePlan.days.length }}
+                                        </div>
+                                        <div class="text-sm text-slate-400">
+                                            Dec 20
+                                        </div>
+                                        <div class="mt-4">
+                                            <div class="flex flex-col gap-4">
+                                                <div v-for="passage in activeDay.passages">
+                                                    <div class="flex flex-row gap-4 text-xl">
+                                                        <div class="text-slate-100" @click="completePassage(passage, activeDay, activePlan)">
+                                                            <i class="fa-solid fa-circle-check" v-if="passage.completedOn"></i>
+                                                            <i class="fa-regular fa-circle" v-else></i>
+                                                        </div>
+                                                        <div class="text-slate-100">
+                                                            {{ passage.reference}}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -123,14 +149,19 @@ import { useAppStore } from '@/stores/appStore.js'
 import { formatDate } from '@/assets/js/dateFormat.js'
 
 const activePlan = ref(null)
+const activeDay = ref(null)
 const deletePlanCheck = ref(false)
-const emits = defineEmits(['close', 'verseSelected', 'deletePlan', 'startPlan'])
+const emits = defineEmits(['close', 'verseSelected', 'deletePlan', 'startPlan', 'completePassage'])
 const props = defineProps({
     plans: {
         type: Array,
         default: []
     }
 })
+
+const completePassage = (passage, day, plan) => {
+    emits('completePassage', { passage, day, plan })
+}
 
 const startPlan = (plan) => {
     activePlan.value = plan
@@ -142,6 +173,10 @@ const deletePlan = (plan) => {
 
 const goBack = () => {
     activePlan.value = null
+}
+
+const selectDay = (day) => {
+    activeDay.value = day
 }
 
 const getProgressPercentage = (plan) => {

@@ -6,7 +6,11 @@
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
     </Transition>
     <Transition name="fade">
-        <ReadingPlans :plans="plans" @close="plansClosed" @verseSelected="verseSelected" v-if="showPlans" @deletePlan="deletePlan"/>
+        <ReadingPlans :plans="plans" 
+            @close="plansClosed" 
+            @verseSelected="verseSelected" v-if="showPlans" 
+            @completePassage="completePassage"
+            @deletePlan="deletePlan"/>
     </Transition>
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
@@ -226,6 +230,22 @@ window.addEventListener('keydown', function(e) {
 const sortedSelectedVerses = computed(() => {
     return selectedVerses.value.sort((a, b) => a - b)
 })
+
+const completePassage = (data) => {
+    var passage = data.passage
+    var day = data.day
+    var plan = data.plan
+    // find plan and mark passage completedOn as today and then save in local storage
+    const activePlan = plans.value.find(p => p.title === plan.title && p.startDate === plan.startDate)
+    const activeDay = activePlan.days.find(d => d.day === day.day)
+    activeDay.passages = activeDay.passages.map(p => {
+        if (p.reference === passage.reference) {
+            p.completedOn = new Date().toISOString()
+        }
+        return p
+    })
+    localStorage.setItem('plans', JSON.stringify(plans.value))
+}
 
 const importData = () => {
     // refresh hisotry and highlights from local storage
