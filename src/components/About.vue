@@ -176,7 +176,7 @@ const importPlans = (options) => {
         if (!plans) {
             localStorage.setItem('plans', JSON.stringify(options.plans))
         } else {
-            highlights.push(...options.plans)
+            plans.push(...options.plans)
             localStorage.setItem('plans', JSON.stringify(plans))
         }
     } else {

@@ -13,18 +13,46 @@
                         </button>
                     </div>
                     <div class="text-slate-100 my-4 shadow-slate-900 shadow-lg">
-                        <h3 class="text-lg font-medium leading-6 text-slate-100" id="modal-title">
+                        <h3 class="text-lg font-medium leading-6 text-slate-100" id="modal-title" v-if="activePlan">
+                            {{ activePlan.title }}
+                            <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-700"
+                                @click="goBack()"
+                            >
+                             Back
+                            </button>
+                        </h3>
+                        <h3 class="text-lg font-medium leading-6 text-slate-100" id="modal-title" v-else>
                             Select a Plan
                         </h3>
                     </div>
                     <div class="text-slate-100">
                         <div class="mt-2 flow-root">
                             <div class="-mx-4 -my-2 overflow-x-auto h-[70vh]">
-                                <div class="inline-block min-w-full align-middle px-6">
-                                    <div v-for="plan in plans" @click="goBack(item)">
+                                <div class="inline-block min-w-full align-middle px-6" v-if="activePlan">
+                                </div>
+                                <div class="inline-block min-w-full align-middle px-6" v-else>
+                                    <div v-for="plan in plans">
                                         <div class="flex flex-row gap-6">
                                             <div>
-                                                <img :src="plan.image"/>
+                                                <img class="rounded-lg shadow-black shadow-lg" :src="plan.image"/>
+                                                <div v-if="!deletePlanCheck">
+                                                    <div class="text-slate-600 hover:text-slate-200 px-4 py-2 underline-offset-4 underline"
+                                                        @click="deletePlanCheck = true"
+                                                    >
+                                                        Delete
+                                                    </div>
+                                                </div>
+                                                <div v-else>
+                                                    <div class="relative z-0 inline-flex items-center gap-x-1.5 rounded-md bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-100 ring-1 ring-inset ring-slate-700 mt-2">
+                                                        Delete?
+                                                    </div>
+                                                    <span class="isolate inline-flex rounded-md shadow-sm mt-2">
+                                                        <button type="button" class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-red-900 px-3 py-2 text-sm font-semibold text-red-100 ring-1 ring-inset ring-red-300 hover:bg-red-600 focus:z-10" @click="deletePlan(plan)">
+                                                            Yes
+                                                        </button>
+                                                        <button type="button" class="relative -ml-px inline-flex items-center rounded-r-md bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-100 ring-1 ring-inset ring-gray-300 hover:bg-slate-600 focus:z-10" @click="deletePlanCheck = false">No</button>
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div class="flex flex-col gap-2">
                                                 <div class="text-xl">
@@ -33,13 +61,16 @@
                                                 <div class="text-sm text-slate-400">
                                                     {{ plan.description }}
                                                 </div>
-                                                <div class="text-sm text-slate-400" v-if="plan.startDate">
-                                                    Started {{ plan.startDate }}
+                                                <div class="text-sm text-slate-400 flex gap-4" v-if="plan.startDate">
                                                     <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-700"
                                                         @click="startPlan(plan)"
                                                     >
-                                                        <i class="fa-solid fa-play pr-2"></i> Continue
+                                                        <i class="fa-solid fa-play sm:pr-2"></i> 
+                                                        <span class="hidden sm:inline-block">Continue</span>
                                                     </button>
+                                                    <span class="px-4 py-2">
+                                                        Started {{ formatDate(plan.startDate) }}
+                                                    </span>
                                                 </div>
                                                 <div class="text-sm text-slate-400" v-else>
                                                     <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-700"
@@ -47,6 +78,13 @@
                                                     >
                                                         <i class="fa-solid fa-play pr-2"></i> Start
                                                     </button>
+                                                </div>
+                                                <div>
+                                                    <div class="mt-2" aria-hidden="true">
+                                                        <div class="overflow-hidden rounded-full bg-slate-200">
+                                                            <div class="h-2 rounded-full bg-slate-600" :style="{'width': getProgressPercentage(plan) + '%'}"></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -72,7 +110,9 @@ import {ref, computed} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
 import { formatDate } from '@/assets/js/dateFormat.js'
 
-const emits = defineEmits(['close', 'verseSelected'])
+const activePlan = ref(null)
+const deletePlanCheck = ref(false)
+const emits = defineEmits(['close', 'verseSelected', 'deletePlan', 'startPlan'])
 const props = defineProps({
     plans: {
         type: Array,
@@ -81,7 +121,31 @@ const props = defineProps({
 })
 
 const startPlan = (plan) => {
+    activePlan.value = plan
+}
 
+const deletePlan = (plan) => {
+    emits('deletePlan', plan)
+}
+
+const goBack = () => {
+    activePlan.value = null
+}
+
+const getProgressPercentage = (plan) => {
+
+    let completed = 0
+    let total = 0
+    plan.days.forEach(day => {
+        day.passages.forEach(passage => {
+            if (passage.completedOn) {
+                completed++
+            }
+            total++
+        })
+    })
+
+    return Math.round((completed / total) * 100)
 }
 
 const selectPassage = (item) => {

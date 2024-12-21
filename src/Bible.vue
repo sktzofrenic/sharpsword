@@ -6,7 +6,7 @@
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
     </Transition>
     <Transition name="fade">
-        <ReadingPlans :plans="plans" @close="plansClosed" @verseSelected="verseSelected" v-if="showPlans"/>
+        <ReadingPlans :plans="plans" @close="plansClosed" @verseSelected="verseSelected" v-if="showPlans" @deletePlan="deletePlan"/>
     </Transition>
     <div class="min-h-full">
         <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
@@ -231,6 +231,7 @@ const importData = () => {
     // refresh hisotry and highlights from local storage
     highlightedVerses.value = JSON.parse(localStorage.getItem('highlightedVerses')) || []
     history.value = JSON.parse(localStorage.getItem('history')) || []
+    plans.value = JSON.parse(localStorage.getItem('plans')) || []
 }
 // on Ctrl + C do a rich copy
 window.addEventListener('keydown', function(e) {
@@ -416,6 +417,11 @@ const searchClosed = () => {
 
 const plansClosed = () => {
     showPlans.value = false
+}
+
+const deletePlan = (plan) => {
+    plans.value = plans.value.filter(p => p.title !== plan.title && p.startDate !== plan.startDate)
+    localStorage.setItem('plans', JSON.stringify(plans.value))
 }
 
 const versePickerClosed = () => {
