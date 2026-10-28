@@ -11,6 +11,7 @@ Live Implementation: [https://sharpsword.io](https://sharpsword.io)
 - Fast search with results returned with each keystroke
 - Fast navigation using keyboard to any book/chapter/verse
 - Mobile first Progressive Web App (PWA) design with responsive layout for desktop
+- Amazing Copy/Paste support with customizable formatting
 - Verse highlighting and verse selections with sharing options
 - Data export and import for easy transition to self hosting
 
