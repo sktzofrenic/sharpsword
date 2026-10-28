@@ -6,10 +6,14 @@
         <VersePicker @close="versePickerClosed" @verseSelected="verseSelected" v-if="showVersePicker"/>
     </Transition>
     <Transition name="fade">
-        <ReadingPlans :plans="plans" 
-            @close="plansClosed" 
-            @verseSelected="verseSelected" v-if="showPlans" 
-            @completePassage="completePassage"
+        <ReadingPlans :plans="plans"
+            :focus="readingPlanContext"
+            @close="plansClosed"
+            v-if="showPlans"
+            @startPlan="startPlan"
+            @togglePassage="togglePassage"
+            @setDayComplete="setDayComplete"
+            @openPassage="openPassage"
             @deletePlan="deletePlan"/>
     </Transition>
     <div class="min-h-full">
@@ -60,7 +64,7 @@
             </div>
         </nav>
         <main>
-            <div  class="mx-auto max-w-7xl px-6  text-slate-100 pb-40 -mt-10 pt-20" style="height: 100vh; overflow-y: auto" ref="versesContainer">
+            <div  class="mx-auto max-w-7xl px-6  text-slate-100 -mt-10 pt-20" :class="planReading ? 'pb-56' : 'pb-40'" style="height: 100vh; overflow-y: auto" ref="versesContainer">
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
                         {{ book }}
@@ -126,6 +130,40 @@
                     </div>
                 </div>
             </Transition>
+            <div class="mx-auto max-w-7xl px-4 text-slate-200" v-if="planReading">
+                <div class="flex items-center gap-2 bg-slate-900 mt-2 rounded-2xl py-2 px-3 text-sm">
+                    <button class="text-slate-400 hover:text-slate-200 text-left grow truncate" @click="showPlans = true">
+                        <span class="font-semibold text-slate-200">{{ planReading.plan.title }}</span>
+                        · Day {{ planReading.day.day }}
+                        <span v-if="planReading.passage"> · {{ planReading.passage.reference }}</span>
+                    </button>
+                    <button class="px-3 py-1 rounded-lg shrink-0"
+                        v-if="planReading.passage"
+                        :class="planReading.passage.completedOn ? 'bg-slate-700 text-slate-200' : 'bg-slate-600 text-white hover:bg-slate-500'"
+                        @click="toggleCurrentPlanPassage"
+                    >
+                        <i class="fa-solid fa-circle-check" v-if="planReading.passage.completedOn"></i>
+                        <i class="fa-regular fa-circle" v-else></i>
+                        Read
+                    </button>
+                    <button class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 truncate max-w-[40%]"
+                        v-if="planReading.next"
+                        @click="goToNextPlanPassage"
+                    >
+                        {{ planReading.passage ? 'Next' : 'Continue' }}: {{ planReading.next.reference }}
+                        <i class="fa-solid fa-right ml-1"></i>
+                    </button>
+                    <button class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 shrink-0"
+                        v-else-if="planReading.passage"
+                        @click="finishPlanDay"
+                    >
+                        Done
+                    </button>
+                    <button class="text-slate-500 hover:text-slate-200 px-1 shrink-0" @click="readingPlanContext = null" aria-label="Hide reading plan bar">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
             <div class="flex flex-col mx-auto max-w-7xl px-4 text-slate-200 sm:flex-row sm:justify-between sm:gap-8">
                 <div class="flex items-center justify-center sm:grow">
                     <div class="flex justify-between w-full text-center bg-slate-900 my-2 rounded-2xl py-2">
@@ -185,6 +223,7 @@ import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
 import http from '@/http'
 import { mobileCheck } from '@/assets/js/mobileDetect.js'
+import { normalizePlans, passageLocation } from '@/assets/js/plans.js'
 
 const baseUrl = useBaseUrlStore()
 const store = useAppStore()
@@ -205,6 +244,8 @@ const presentedVerses = ref([])
 const selectedVerses = ref([])
 const highlightedVerses = ref([])
 const plans = ref([])
+// { planId, day } of the plan day being read, set when a passage is opened from Plans
+const readingPlanContext = ref(null)
 const history = ref([])
 const lastLocation = ref({})
 
@@ -231,27 +272,116 @@ const sortedSelectedVerses = computed(() => {
     return selectedVerses.value.sort((a, b) => a - b)
 })
 
-const completePassage = (data) => {
-    var passage = data.passage
-    var day = data.day
-    var plan = data.plan
-    // find plan and mark passage completedOn as today and then save in local storage
-    const activePlan = plans.value.find(p => p.title === plan.title && p.startDate === plan.startDate)
-    const activeDay = activePlan.days.find(d => d.day === day.day)
-    activeDay.passages = activeDay.passages.map(p => {
-        if (p.reference === passage.reference) {
-            p.completedOn = new Date().toISOString()
-        }
-        return p
-    })
+const savePlans = () => {
     localStorage.setItem('plans', JSON.stringify(plans.value))
+}
+
+const loadPlans = () => {
+    const stored = JSON.parse(localStorage.getItem('plans'))
+    plans.value = normalizePlans(stored)
+    if (stored) {
+        // persist ids given to plans saved by older versions
+        savePlans()
+    }
+}
+
+const findPlanDay = (planId, day) => {
+    return plans.value.find(p => p.id === planId)?.days.find(d => d.day === day)
+}
+
+const startPlan = (plan) => {
+    plans.value.push(plan)
+    savePlans()
+}
+
+const togglePassage = ({ planId, day, index }) => {
+    const passage = findPlanDay(planId, day)?.passages[index]
+    if (!passage) {
+        return
+    }
+    passage.completedOn = passage.completedOn ? null : new Date().toISOString()
+    savePlans()
+}
+
+const setDayComplete = ({ planId, day, complete }) => {
+    findPlanDay(planId, day)?.passages.forEach(p => {
+        p.completedOn = complete ? (p.completedOn || new Date().toISOString()) : null
+    })
+    savePlans()
+}
+
+const goToPassage = (passage) => {
+    const location = passageLocation(passage)
+    if (location.wholeChapter) {
+        changeChapter(location)
+        showPlans.value = false
+        updateHistory(1)
+    } else {
+        verseSelected(location)
+    }
+}
+
+const openPassage = ({ planId, day, index }) => {
+    const passage = findPlanDay(planId, day)?.passages[index]
+    if (!passage) {
+        return
+    }
+    readingPlanContext.value = { planId, day }
+    goToPassage(passage)
+}
+
+// The plan day being read, and where the open chapter sits in it
+const planReading = computed(() => {
+    if (!readingPlanContext.value) {
+        return null
+    }
+    const plan = plans.value.find(p => p.id === readingPlanContext.value.planId)
+    const day = plan?.days.find(d => d.day === readingPlanContext.value.day)
+    if (!day) {
+        return null
+    }
+    const index = day.passages.findIndex(p => {
+        const location = passageLocation(p)
+        return location.bookId === Number(bookId.value) && location.chapter === Number(chapter.value)
+    })
+    return {
+        plan,
+        day,
+        index,
+        passage: day.passages[index] || null,
+        // after the open passage, or the first unread one if the reader wandered off
+        next: index >= 0 ? day.passages[index + 1] || null : day.passages.find(p => !p.completedOn) || null,
+    }
+})
+
+const toggleCurrentPlanPassage = () => {
+    const { plan, day, index } = planReading.value
+    togglePassage({ planId: plan.id, day: day.day, index })
+}
+
+const goToNextPlanPassage = () => {
+    const { passage, next } = planReading.value
+    if (passage && !passage.completedOn) {
+        passage.completedOn = new Date().toISOString()
+        savePlans()
+    }
+    goToPassage(next)
+}
+
+const finishPlanDay = () => {
+    const { passage } = planReading.value
+    if (!passage.completedOn) {
+        passage.completedOn = new Date().toISOString()
+        savePlans()
+    }
+    showPlans.value = true
 }
 
 const importData = () => {
     // refresh hisotry and highlights from local storage
     highlightedVerses.value = JSON.parse(localStorage.getItem('highlightedVerses')) || []
     history.value = JSON.parse(localStorage.getItem('history')) || []
-    plans.value = JSON.parse(localStorage.getItem('plans')) || []
+    loadPlans()
 }
 // on Ctrl + C do a rich copy
 window.addEventListener('keydown', function(e) {
@@ -439,9 +569,12 @@ const plansClosed = () => {
     showPlans.value = false
 }
 
-const deletePlan = (plan) => {
-    plans.value = plans.value.filter(p => p.title !== plan.title && p.startDate !== plan.startDate)
-    localStorage.setItem('plans', JSON.stringify(plans.value))
+const deletePlan = (planId) => {
+    plans.value = plans.value.filter(p => p.id !== planId)
+    if (readingPlanContext.value?.planId === planId) {
+        readingPlanContext.value = null
+    }
+    savePlans()
 }
 
 const versePickerClosed = () => {
@@ -526,7 +659,7 @@ onMounted(async () => {
     // get last location from local storage
     lastLocation.value = JSON.parse(localStorage.getItem('lastLocation')) || {}
 
-    plans.value = JSON.parse(localStorage.getItem('plans')) || []
+    loadPlans()
 
     if (lastLocation.value.bookId && lastLocation.value.chapter) {
         bookId.value = lastLocation.value.bookId

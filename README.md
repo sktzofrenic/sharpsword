@@ -92,6 +92,14 @@ npm run dev
 
 Open the URL Vite prints (usually http://localhost:5173). When served from `localhost`, the frontend sends API requests to `http://127.0.0.1:3000`.
 
+Styles come from the committed `src/assets/output.css`. After using Tailwind classes that weren't used anywhere before, regenerate it with `npm run css`.
+
+## Reading Plans
+
+Plans that ship with the app are listed in `PLAN_CATALOG` in `src/assets/js/plans.js`. Each one points to a JSON file in `src/assets/plans/` that holds one array of USFM references per day, for example `["GEN.1", "PSA.119.1-88"]`. When someone starts a plan, a copy with their start date and progress is saved in `localStorage`.
+
+To add a plan, put its JSON file in `src/assets/plans/`, add an entry to `PLAN_CATALOG`, and run `npm run validate:plans`. This checks that every reference is valid and that the plan covers every chapter.
+
 ## Production Build
 
 `npm run build` builds the frontend into `public/`, which the Go server serves as static files alongside the API.

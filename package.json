@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:plans": "node scripts/validate-plans.js",
+    "css": "tailwindcss -i src/assets/main.css -o src/assets/output.css"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.9",
