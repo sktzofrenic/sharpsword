@@ -71,7 +71,8 @@
             </div>
         </nav>
         <main>
-            <div  class="mx-auto max-w-7xl px-6  text-slate-100 -mt-10 pt-20" :class="planReading ? 'pb-56' : 'pb-40'" style="height: 100vh; overflow-y: auto" ref="versesContainer">
+            <!-- overflow-x-hidden: nothing here should ever scroll sideways, e.g. the verse glow on phones -->
+            <div  class="mx-auto max-w-7xl px-6  text-slate-100 -mt-10 pt-20 overflow-x-hidden" :class="planReading ? 'pb-56' : 'pb-40'" style="height: 100vh; overflow-y: auto" ref="versesContainer">
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
                         {{ book }}

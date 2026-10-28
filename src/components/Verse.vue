@@ -81,7 +81,8 @@ const props = defineProps({
 .verse-container::before {
     content: '';
     position: absolute;
-    inset: -1.5em -2em;
+    /* no wider than the reading area's side padding (px-6), or phones scroll sideways */
+    inset: -1.5em -1.5rem;
     z-index: -1;
     pointer-events: none;
     background: radial-gradient(closest-side, #ff4da666, #ff4da626 55%, transparent);
