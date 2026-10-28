@@ -31,41 +31,70 @@ The data below simulates 20,000 searches through the full Bible text for the wor
 
 ## Setup
 
-### Install Go
+### Prerequisites
 
-Install Go from the [official website](https://golang.org/doc/install).
-
-### Install Air
-
-Install _air_ for hot reloading with `go get -u github.com/cosmtrek/air`.
-
-### Install Node.js
-
-Install Node.js from the [official website](https://nodejs.org/en/download/).
-
-### Install Vue CLI
-
-Install Vue CLI with `npm install -g @vue/cli`.
+- [Go](https://golang.org/doc/install)
+- [Node.js](https://nodejs.org/en/download/)
+- [PostgreSQL](https://www.postgresql.org/download/)
+- [Air](https://github.com/air-verse/air) (optional, for hot reloading the Go server): `go install github.com/air-verse/air@latest`
 
 ### Install Dependencies
 
-Install the Go dependencies with `go mod download` in the root directory.
+From the root directory:
 
-Install the Vue dependencies with `npm install` in the `client` directory.
+```
+go mod download
+npm install
+```
+
+### Database
+
+Create a database, load the schema, and import the KJV text from `data/KJV`. The first line of `data/table_structure.sql` grants access to the production database user, so skip it locally:
+
+```
+createdb sharpsword_dev
+grep -v '^grant ' data/table_structure.sql | psql -d sharpsword_dev
+cd data
+psql -d sharpsword_dev <<'SQL'
+\copy books from 'KJV/books.tsv' with (format csv, delimiter E'\t', header true)
+\copy verses from 'KJV/verses.tsv' with (format csv, delimiter E'\t', header true)
+\copy paragraphs from 'KJV/paragraphs.tsv' with (format csv, delimiter E'\t', header true)
+\copy descriptions from 'KJV/descriptions.tsv' with (format csv, delimiter E'\t', header true)
+\copy headings from 'KJV/headings.tsv' with (format csv, delimiter E'\t', header true)
+SQL
+```
 
 ### Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory:
+
 ```
 PORT=3000
+DATABASE_URL=postgres://localhost:5432/sharpsword_dev
 ```
 
-## Start the Server
+## Development
 
-To start the server, run `go run main.go` in the root directory. The server will start on port 3000 or whatever is set in your `.env` file.
+Run the API and the frontend in two terminals from the root directory.
 
-To start the server with hot reloading, first install _air_ and then run `air` in the root directory.
+Start the Go API server on port 3000 (or `PORT` from `.env`):
 
+```
+air          # with hot reloading
+go run .     # without
+```
+
+Start the Vite dev server for the Vue frontend:
+
+```
+npm run dev
+```
+
+Open the URL Vite prints (usually http://localhost:5173). When served from `localhost`, the frontend sends API requests to `http://127.0.0.1:3000`.
+
+## Production Build
+
+`npm run build` builds the frontend into `public/`, which the Go server serves as static files alongside the API.
 
 ## Tests
 
