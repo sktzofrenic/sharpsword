@@ -7,6 +7,7 @@ import (
     "fmt"
     "os"
     "context"
+    "strconv"
     "strings"
 )
 
@@ -16,6 +17,12 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
         searchTerm := c.Query("q")
         version := strings.ToUpper(c.Params("version"))
 
+        // optional comma-separated book ids to search within; nil searches every book
+        books, err := ParseBooks(c.Query("books"))
+        if err != nil {
+            return fiber.NewError(fiber.StatusBadRequest, err.Error())
+        }
+
         count := 0
         count_query := `
             SELECT count(*)
@@ -23,10 +30,11 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
                     plainto_tsquery('english_nostop', $1) q
 
                 WHERE verses.ts_vec @@ q
-                    and verses.version = $2;
+                    and verses.version = $2
+                    and ($3::int[] IS NULL OR verses.book = ANY($3::int[]));
         `
 
-        err := conn.QueryRow(context.Background(), count_query, searchTerm, version).Scan(&count)
+        err = conn.QueryRow(context.Background(), count_query, searchTerm, version, books).Scan(&count)
 
         query := `
                 SELECT
@@ -47,16 +55,13 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
                 WHERE
                     verses.ts_vec @@ q
                     and verses.version = $2
-                ORDER BY
-                    rank DESC
-                    LIMIT
-                200
+                    and ($3::int[] IS NULL OR verses.book = ANY($3::int[]))
                 ) search
                 join books b on b.book_id = search.book
                 ORDER BY
                 rank DESC;
         `
-        rows, err := conn.Query(context.Background(), query, searchTerm, version)
+        rows, err := conn.Query(context.Background(), query, searchTerm, version, books)
 
         var rowSlice = []models.SearchResult{}
         for rows.Next() {
@@ -83,4 +88,21 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
             "c": count,
         })
     })
+}
+
+// ParseBooks turns "1,2,40" into book ids. An empty string means no filter (nil).
+func ParseBooks(param string) ([]int32, error) {
+    if strings.TrimSpace(param) == "" {
+        return nil, nil
+    }
+
+    var books []int32
+    for _, part := range strings.Split(param, ",") {
+        id, err := strconv.Atoi(strings.TrimSpace(part))
+        if err != nil || id < 1 || id > 66 {
+            return nil, fmt.Errorf("invalid book id %q", part)
+        }
+        books = append(books, int32(id))
+    }
+    return books, nil
 }

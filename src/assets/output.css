@@ -1965,8 +1965,16 @@ select {
     margin-top: 1rem;
   }
 
+  .sm\:inline {
+    display: inline;
+  }
+
   .sm\:flex {
     display: flex;
+  }
+
+  .sm\:hidden {
+    display: none;
   }
 
   .sm\:w-\[20vw\] {
