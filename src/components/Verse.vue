@@ -68,9 +68,31 @@ const props = defineProps({
 .violet :deep(.content) {
     background-color: #664dd9c2;
 }
-.presented {
-    transition: all 0.3s ease;
-    text-shadow: 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+/*
+ * Glow behind the verse a search or link jumped to. It is a gradient painted
+ * once and faded with opacity, which the compositor animates without
+ * repainting; a blurred text-shadow had to be re-rasterized per glyph on
+ * every frame and dropped scrolling to ~18 fps.
+ */
+.verse-container {
+    position: relative;
+    isolation: isolate;
+}
+.verse-container::before {
+    content: '';
+    position: absolute;
+    inset: -1.5em -2em;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(closest-side, #ff4da666, #ff4da626 55%, transparent);
+    opacity: 0;
+    /* slow fade out once the highlight ends */
+    transition: opacity 3s ease-in-out;
+}
+.presented::before {
+    opacity: 1;
+    /* quick fade in when landing on the verse */
+    transition: opacity 0.6s ease;
 }
 
 .selected :deep(.content)  {
