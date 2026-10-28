@@ -1002,10 +1002,6 @@ select {
   display: inline-flex;
 }
 
-.table {
-  display: table;
-}
-
 .flow-root {
   display: flow-root;
 }
@@ -1042,12 +1038,12 @@ select {
   height: 100vh;
 }
 
-.max-h-\[60vh\] {
-  max-height: 60vh;
-}
-
 .max-h-\[calc\(100dvh-6rem\)\] {
   max-height: calc(100dvh - 6rem);
+}
+
+.max-h-\[min\(60vh\2c calc\(100dvh-14rem\)\)\] {
+  max-height: min(60vh,calc(100dvh - 14rem));
 }
 
 .min-h-full {
@@ -1084,10 +1080,6 @@ select {
 
 .min-w-0 {
   min-width: 0px;
-}
-
-.min-w-full {
-  min-width: 100%;
 }
 
 .max-w-7xl {
@@ -1216,11 +1208,6 @@ select {
 .divide-slate-600 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(71 85 105 / var(--tw-divide-opacity));
-}
-
-.divide-slate-700 > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-opacity: 1;
-  border-color: rgb(51 65 85 / var(--tw-divide-opacity));
 }
 
 .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
@@ -1492,20 +1479,8 @@ select {
   padding-bottom: 14rem;
 }
 
-.pl-3 {
-  padding-left: 0.75rem;
-}
-
-.pl-4 {
-  padding-left: 1rem;
-}
-
 .pr-2 {
   padding-right: 0.5rem;
-}
-
-.pr-3 {
-  padding-right: 0.75rem;
 }
 
 .pr-4 {
@@ -1538,10 +1513,6 @@ select {
 
 .text-center {
   text-align: center;
-}
-
-.text-right {
-  text-align: right;
 }
 
 .align-middle {
@@ -1900,6 +1871,10 @@ select {
   background-color: rgb(51 65 85 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-slate-800\/60:hover {
+  background-color: rgb(30 41 59 / 0.6);
+}
+
 .hover\:text-gray-500:hover {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
@@ -1996,6 +1971,11 @@ select {
   opacity: 0.5;
 }
 
+.group:hover .group-hover\:bg-slate-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+}
+
 @media (min-width: 640px) {
   .sm\:my-8 {
     margin-top: 2rem;
@@ -2026,8 +2006,8 @@ select {
     display: none;
   }
 
-  .sm\:w-\[20vw\] {
-    width: 20vw;
+  .sm\:w-\[22rem\] {
+    width: 22rem;
   }
 
   .sm\:w-\[26rem\] {
@@ -2086,19 +2066,6 @@ select {
     padding: 1.5rem;
   }
 
-  .sm\:px-6 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  .sm\:pl-0 {
-    padding-left: 0px;
-  }
-
-  .sm\:pr-0 {
-    padding-right: 0px;
-  }
-
   .sm\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
@@ -2106,13 +2073,6 @@ select {
 
   .sm\:leading-6 {
     line-height: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:px-8 {
-    padding-left: 2rem;
-    padding-right: 2rem;
   }
 }
 
