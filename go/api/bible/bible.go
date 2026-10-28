@@ -8,7 +8,10 @@ import (
     "fmt"
     "os"
     "context"
+    "errors"
     "strings"
+    "sync"
+    "github.com/goccy/go-json"
 )
 
 func Register(app *fiber.App, conn *pgxpool.Pool) {
@@ -68,6 +71,23 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
         )
     })
 
+
+    app.Get("/api/v1/bible/:version/all", func(c fiber.Ctx) error {
+        version := strings.ToUpper(c.Params("version"))
+
+        body, err := allVerses(conn, version)
+        if errors.Is(err, errUnknownVersion) {
+            return fiber.ErrNotFound
+        }
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Query failed: %v\n", err)
+            return fiber.ErrInternalServerError
+        }
+
+        c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+        return c.Send(body)
+    })
+
     app.Get("/api/v1/bible/:version/:book/:chapter", func(c fiber.Ctx) error {
         version := strings.ToUpper(c.Params("version"))
 
@@ -77,7 +97,30 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
         chapter := c.Params("chapter")
         chapter_num, err := strconv.Atoi(chapter)
 
-        query := `SELECT 
+        // the chapter plus the last verse before it and the first verse after it,
+        // which the client uses to link to the previous and next chapters
+        query := verseSelect + `
+        WHERE verses.version = $1 
+        AND verses.verse_id >= (SELECT coalesce(max(verses.verse_id), 0) FROM verses WHERE version = $1 and verse_id < $2 - 1)
+        AND verses.verse_id <= (SELECT coalesce(min(verses.verse_id), 66999999) FROM verses WHERE version = $1 and verse_id > $2 + 999)
+        ORDER BY verses.verse_id ASC;
+        `
+        verseId := (book_num * 1000000) + (chapter_num * 1000)
+
+        rowSlice, err := queryVerses(conn, query, version, verseId)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+            os.Exit(1)
+        }
+
+        return c.JSON(fiber.Map{
+            "v": rowSlice,
+        })
+    })
+}
+
+// Columns and joins for models.Verse, shared by the chapter and whole-Bible endpoints
+const verseSelect = `SELECT 
             text_formatted,
             coalesce(headings.heading_plain, '') as heading,
             books.book_name as book,
@@ -90,44 +133,71 @@ func Register(app *fiber.App, conn *pgxpool.Pool) {
             left join books on verses.book = books.book_id
             left join descriptions on verses.verse_id = descriptions.verse_id and descriptions.version = $1
             left join headings on verses.verse_id = headings.verse_id and headings.version = $1
-            left join paragraphs on verses.verse_id = paragraphs.verse_id and paragraphs.version = $1
-        WHERE verses.version = $1 
-        AND verses.verse_id >= (SELECT coalesce(max(verses.verse_id), 0) FROM verses WHERE version = $1 and verse_id < $2 - 1)
-        AND verses.verse_id <= (SELECT coalesce(min(verses.verse_id), 66999999) FROM verses WHERE version = $1 and verse_id > $2 + 999)
-        ORDER BY verses.verse_id ASC;
-        `
-        verseId := (book_num * 1000000) + (chapter_num * 1000)
+            left join paragraphs on verses.verse_id = paragraphs.verse_id and paragraphs.version = $1`
 
-        rows, err := conn.Query(context.Background(), query, version, verseId)
+func queryVerses(conn *pgxpool.Pool, query string, args ...any) ([]models.Verse, error) {
+    rows, err := conn.Query(context.Background(), query, args...)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
 
-        var rowSlice []models.Verse
+    var rowSlice []models.Verse
 
-        for rows.Next() {
-            var row models.Verse
-            err := rows.Scan(
-                &row.T,
-                &row.H,
-                &row.B,
-                &row.ID,
-                &row.BID,
-                &row.P,
-                &row.D,
-                &row.C,
-            )
-            if err != nil {
-                fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)
-            }
-            rowSlice = append(rowSlice, row)
-        }
-        
+    for rows.Next() {
+        var row models.Verse
+        err := rows.Scan(
+            &row.T,
+            &row.H,
+            &row.B,
+            &row.ID,
+            &row.BID,
+            &row.P,
+            &row.D,
+            &row.C,
+        )
         if err != nil {
-            fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-            os.Exit(1)
+            fmt.Fprintf(os.Stderr, "Scan failed: %v\n", err)
         }
+        rowSlice = append(rowSlice, row)
+    }
 
+    return rowSlice, rows.Err()
+}
 
-        return c.JSON(fiber.Map{
-            "v": rowSlice,
-        })
-    })
+// The whole Bible is about 14 MB of JSON and never changes while the server runs,
+// so it is built once per version and kept in memory.
+var errUnknownVersion = errors.New("unknown version")
+
+var (
+    allVersesMu    sync.Mutex
+    allVersesCache = map[string][]byte{}
+)
+
+func allVerses(conn *pgxpool.Pool, version string) ([]byte, error) {
+    allVersesMu.Lock()
+    defer allVersesMu.Unlock()
+
+    if body, ok := allVersesCache[version]; ok {
+        return body, nil
+    }
+
+    rowSlice, err := queryVerses(conn, verseSelect+`
+        WHERE verses.version = $1
+        ORDER BY verses.verse_id ASC;
+    `, version)
+    if err != nil {
+        return nil, err
+    }
+    if len(rowSlice) == 0 {
+        return nil, errUnknownVersion
+    }
+
+    body, err := json.Marshal(fiber.Map{"v": rowSlice})
+    if err != nil {
+        return nil, err
+    }
+
+    allVersesCache[version] = body
+    return body, nil
 }

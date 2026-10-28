@@ -17,6 +17,41 @@
                     <dd class="mt-2 text-base/7 text-slate-400 pt-2">
                         Live implementation of the app is available at <a href="https://sharpsword.io" target="_blank" class="text-slate-200 hover:text-slate-100">SharpSword.io</a> and is hosted for free, please consider a donation on our GitHub page. You can download and run your own copy as well.
                     </dd>
+                    <dd class="mt-2 text-base/7 text-slate-400 pt-2" v-if="canSaveOffline()">
+                        <p class="text-slate-200">Offline reading</p>
+                        <p v-if="offline.saving">
+                            {{ offline.saved ? `Saving ${offline.saved.toLocaleString()} of ${offline.total.toLocaleString()} chapters…` : 'Downloading the Bible…' }}
+                        </p>
+                        <p v-else-if="offline.count === CHAPTER_COUNT">
+                            The whole Bible is saved on this device.
+                        </p>
+                        <p v-else-if="offline.count > 0">
+                            {{ offline.count.toLocaleString() }} of {{ CHAPTER_COUNT.toLocaleString() }} chapters are saved from your reading. Save the rest to read anywhere without a connection.
+                        </p>
+                        <p v-else>
+                            Save the whole Bible to read anywhere without a connection.
+                        </p>
+                        <div class="overflow-hidden rounded-full bg-slate-700 mt-2" v-if="offline.saving" aria-hidden="true">
+                            <div class="h-2 rounded-full bg-slate-300 transition-all" :style="{'width': (offline.total ? offline.saved / offline.total * 100 : 5) + '%'}"></div>
+                        </div>
+                        <div class="bg-slate-900 text-red-200 p-4 my-2 rounded-lg" v-if="offline.error">
+                            {{ offline.error }}
+                        </div>
+                        <div class="flex gap-4 items-center mt-2" v-if="!offline.saving">
+                            <button class="text-slate-100 hover:text-slate-200 px-4 py-2 rounded-lg bg-slate-900"
+                                v-if="offline.count < CHAPTER_COUNT"
+                                @click="saveOffline"
+                            >
+                                <i class="fa-solid fa-download"></i> Save Bible (about 2 MB)
+                            </button>
+                            <button class="text-slate-500 hover:text-slate-200 underline-offset-4 underline text-sm"
+                                v-if="offline.count > 0"
+                                @click="removeOffline"
+                            >
+                                Remove offline copy
+                            </button>
+                        </div>
+                    </dd>
                     <dd class="mt-2 text-base/7 text-slate-400 pt-2">
                         Download your history, highlights, and plan data.
 
@@ -77,8 +112,16 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
+import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
+import {
+    CHAPTER_COUNT,
+    canSaveOffline,
+    removeBibleOffline,
+    saveBibleOffline,
+    savedChapterCount,
+} from '@/assets/js/offline.js'
 
 const emits = defineEmits(['close', 'importData'])
 
@@ -87,8 +130,44 @@ const close = () => {
 }
 
 const store = useAppStore()
+const baseUrl = useBaseUrlStore()
 const msg = ref('')
 const selected = ref('merge')
+
+const offline = reactive({ count: 0, saving: false, saved: 0, total: 0, error: '' })
+
+const refreshOfflineCount = async () => {
+    offline.count = await savedChapterCount(baseUrl.baseUrl)
+}
+
+const saveOffline = async () => {
+    Object.assign(offline, { saving: true, saved: 0, total: 0, error: '' })
+    try {
+        await saveBibleOffline(baseUrl.baseUrl, (progress) => {
+            if (progress.phase === 'saving') {
+                offline.saved = progress.saved
+                offline.total = progress.total
+            }
+        })
+    } catch (error) {
+        console.error(error)
+        offline.error = "Couldn't save the Bible. Check your connection and try again."
+    } finally {
+        offline.saving = false
+        await refreshOfflineCount()
+    }
+}
+
+const removeOffline = async () => {
+    await removeBibleOffline()
+    await refreshOfflineCount()
+}
+
+onMounted(() => {
+    if (canSaveOffline()) {
+        refreshOfflineCount()
+    }
+})
 
 const flash = (message) => {
     msg.value = message

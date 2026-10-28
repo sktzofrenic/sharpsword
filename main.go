@@ -7,8 +7,10 @@ import (
     "github.com/gofiber/fiber/v3/middleware/static"
     recoverer "github.com/gofiber/fiber/v3/middleware/recover"
     "github.com/gofiber/fiber/v3/middleware/cors"
+    "github.com/gofiber/fiber/v3/middleware/compress"
     "sharpsword/go/api/bible"
     "sharpsword/go/api/search"
+    "sharpsword/go/cache"
     "sharpsword/go/settings"
     "sharpsword/go/database"
     "github.com/goccy/go-json"
@@ -34,6 +36,9 @@ func main() {
 
     app.Use(recoverer.New())
     app.Use(cors.New())
+    app.Use(cache.New())
+    // the whole-Bible download is ~14 MB of JSON and ~2 MB gzipped
+    app.Use(compress.New())
 
     app.Get("/*", static.New(("./public")))
 

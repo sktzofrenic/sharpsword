@@ -28,7 +28,8 @@ http.interceptors.response.use(
     },
     (error) => {
         console.log(error)
-        if (error.response.status === 401) {
+        // network failures (e.g. offline) have no response
+        if (error.response?.status === 401) {
             const store = useAppStore()
             // send user to login with router
             store.logout()

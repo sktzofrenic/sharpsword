@@ -1,4 +1,12 @@
 <template>
+    <UpdatePrompt />
+    <Transition name="fade">
+        <div class="fixed top-20 inset-x-0 z-20 flex justify-center px-4 pointer-events-none" v-if="loadError" role="alert">
+            <div class="rounded-2xl bg-slate-800 ring-1 ring-inset ring-slate-700 shadow-lg shadow-black px-4 py-3 text-sm text-slate-100">
+                {{ loadError }}
+            </div>
+        </div>
+    </Transition>
     <Transition name="fade">
         <Search @close="searchClosed" v-show="showSearch" @verseSelected="verseSelected" :visible="showSearch" />
     </Transition>
@@ -217,6 +225,7 @@ import ReadingPlans from '@/components/ReadingPlans.vue'
 import FuzzyFinder from '@/components/FuzzyFinder.vue'
 import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
+import UpdatePrompt from '@/components/UpdatePrompt.vue'
 import dayjs from 'dayjs'
 import { onMounted, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
@@ -224,6 +233,7 @@ import { useAppStore } from '@/stores/appStore.js'
 import http from '@/http'
 import { mobileCheck } from '@/assets/js/mobileDetect.js'
 import { normalizePlans, passageLocation } from '@/assets/js/plans.js'
+import { BOOKS_BY_ID } from '@/assets/js/books.js'
 
 const baseUrl = useBaseUrlStore()
 const store = useAppStore()
@@ -252,6 +262,16 @@ const lastLocation = ref({})
 const prevChapter = ref({})
 const nextChapter = ref({})
 const reference = ref('')
+const loadError = ref('')
+let loadErrorTimer = null
+
+const showLoadError = (message) => {
+    loadError.value = message
+    clearTimeout(loadErrorTimer)
+    loadErrorTimer = setTimeout(() => {
+        loadError.value = ''
+    }, 4000)
+}
 
 // on left and right arrow key press, change chapter
 window.addEventListener('keydown', function(e) {
@@ -648,6 +668,16 @@ const getVerses = async (verseId) => {
 
     } catch (error) {
         console.error(error)
+        const requested = `${BOOKS_BY_ID[bookId.value]?.name ?? ''} ${chapter.value}`.trim()
+        // point the header back at the chapter that is still on screen
+        if (verses.value.length > 0) {
+            bookId.value = verses.value[0].BID
+            book.value = verses.value[0].B
+            chapter.value = verses.value[0].C
+        }
+        showLoadError(error.response
+            ? `Couldn't load ${requested}. Please try again.`
+            : `${requested} isn't available offline yet.`)
     }
 }
 

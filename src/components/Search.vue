@@ -45,7 +45,10 @@
                                 <span class="text-slate-300">{{result.R}}</span>
                             </div>
                         </div>
-                        <div v-if="filteredResults.length === 0" class="text-slate-100 text-center mt-4">
+                        <div v-if="searchError" class="text-slate-400 text-center mt-4">
+                            {{ searchError }}
+                        </div>
+                        <div v-else-if="filteredResults.length === 0" class="text-slate-100 text-center mt-4">
                             No results found
                         </div>
                     </div>
@@ -115,14 +118,21 @@ watch(searchTerm, () => {
 
 
 const results = ref([])
+const searchError = ref('')
 
 const search = async () => {
     try {
         const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/search?q=${searchTerm.value}`)
         results.value = response.data.r
         totalResults.value = response.data.c
+        searchError.value = ''
     } catch (error) {
         console.error(error)
+        results.value = []
+        totalResults.value = 0
+        searchError.value = error.response
+            ? 'Search failed. Please try again.'
+            : 'Search needs an internet connection.'
     }
 }
 

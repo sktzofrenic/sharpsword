@@ -4,8 +4,9 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import Bible from './Bible.vue'
+import { requestPersistentStorage } from './assets/js/offline.js'
 
-const worker = new Worker(new URL('./assets/js/service-worker.js', import.meta.url))
+requestPersistentStorage()
 
 const app = createApp(Bible)
 
