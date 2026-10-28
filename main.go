@@ -10,6 +10,7 @@ import (
     "github.com/gofiber/fiber/v3/middleware/compress"
     "sharpsword/go/api/bible"
     "sharpsword/go/api/search"
+    "sharpsword/go/api/vault"
     "sharpsword/go/cache"
     "sharpsword/go/settings"
     "sharpsword/go/database"
@@ -44,6 +45,7 @@ func main() {
 
     bible.Register(app, db)
     search.Register(app, db)
+    vault.Register(app, db)
 
     fmt.Println("Server is running on port " + settings.Port)
 

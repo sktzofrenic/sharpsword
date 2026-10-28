@@ -53,6 +53,7 @@
                             </button>
                         </div>
                     </dd>
+                    <SyncSettings />
                     <dd class="mt-2 text-base/7 text-slate-400 pt-2">
                         Download your history, highlights, and plan data.
 
@@ -116,6 +117,8 @@
 import {ref, reactive, onMounted} from 'vue'
 import { useAppStore } from '@/stores/appStore.js'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
+import { useUserDataStore } from '@/stores/userDataStore.js'
+import SyncSettings from '@/components/SyncSettings.vue'
 import {
     CHAPTER_COUNT,
     canSaveOffline,
@@ -124,13 +127,14 @@ import {
     savedChapterCount,
 } from '@/assets/js/offline.js'
 
-const emits = defineEmits(['close', 'importData'])
+const emits = defineEmits(['close'])
 
 const close = () => {
     emits('close')
 }
 
 const store = useAppStore()
+const userData = useUserDataStore()
 const baseUrl = useBaseUrlStore()
 const msg = ref('')
 const selected = ref('merge')
@@ -185,8 +189,14 @@ const importData = (e) => {
     }
     const reader = new FileReader()
     reader.onload = (e) => {
-        const data = JSON.parse(e.target.result)
-        if (!data.type) {
+        let data
+        try {
+            data = JSON.parse(e.target.result)
+        } catch {
+            flash('Invalid data')
+            return
+        }
+        if (!data?.type) {
             flash('Invalid data')
             return
         }
@@ -217,95 +227,57 @@ const importData = (e) => {
 }
 
 const importHistory = (options) => {
-    if (options.option === 'merge') {
-        const history = JSON.parse(localStorage.getItem('history'))
-        if (!history) {
-            localStorage.setItem('history', JSON.stringify(options.history))
-        } else {
-            history.push(...options.history)
-            // sort history by timestamp
-            history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-            localStorage.setItem('history', JSON.stringify(history))
-        }
-    } else {
-        localStorage.setItem('history', JSON.stringify(options.history))
-    }
+    userData.importHistory(options.history, options.option)
     flash('History imported')
-    emits('importData')
 }
 
 const importHighlights = (options) => {
-    if (options.option === 'merge') {
-        const highlights = JSON.parse(localStorage.getItem('highlightedVerses'))
-        if (!highlights) {
-            localStorage.setItem('highlightedVerses', JSON.stringify(options.highlights))
-        } else {
-            highlights.push(...options.highlights)
-            localStorage.setItem('highlightedVerses', JSON.stringify(highlights))
-        }
-    } else {
-        localStorage.setItem('highlightedVerses', JSON.stringify(options.highlights))
-    }
+    userData.importHighlights(options.highlights, options.option)
     flash('Highlights imported')
-    emits('importData')
 }
 
 const importPlans = (options) => {
-    if (options.option === 'merge') {
-        const plans = JSON.parse(localStorage.getItem('plans'))
-        if (!plans) {
-            localStorage.setItem('plans', JSON.stringify(options.plans))
-        } else {
-            plans.push(...options.plans)
-            localStorage.setItem('plans', JSON.stringify(plans))
-        }
-    } else {
-        localStorage.setItem('plans', JSON.stringify(options.plans))
-    }
+    userData.importPlans(options.plans, options.option)
     flash('Plans imported')
-    emits('importData')
 }
 
 const downloadHistory = () => {
-    var history = localStorage.getItem('history')
-    if (!history) {
+    if (userData.history.length === 0) {
         flash('No history to download')
         return
     }
-    history = {
+    var history = {
         timestamp: new Date(),
         type: 'history',
-        history: JSON.parse(history)
+        history: userData.history
     }
     var filename =  `sharpsword-history-${new Date().toISOString()}.json`
     download(history, filename)
 }
 
 const downloadHighlights = () => {
-    var highlights = localStorage.getItem('highlightedVerses')
-    if (!highlights) {
+    if (userData.highlights.length === 0) {
         flash('No highlights to download')
         return
     }
-    highlights = {
+    var highlights = {
         timestamp: new Date(),
         type: 'highlight',
-        highlights: JSON.parse(highlights)
+        highlights: userData.highlights
     }
     var filename =  `sharpsword-highlights-${new Date().toISOString()}.json`
     download(highlights, filename)
 }
 
 const downloadPlans = () => {
-    var plans = localStorage.getItem('plans')
-    if (!plans) {
+    if (userData.plans.length === 0) {
         flash('No plans to download')
         return
     }
-    plans = {
+    var plans = {
         timestamp: new Date(),
         type: 'plan',
-        plans: JSON.parse(plans)
+        plans: userData.plans
     }
     var filename =  `sharpsword-plans-${new Date().toISOString()}.json`
     download(plans, filename)

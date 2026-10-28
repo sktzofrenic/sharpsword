@@ -81,3 +81,13 @@ CREATE TEXT SEARCH DICTIONARY english_stem_nostop (
 CREATE TEXT SEARCH CONFIGURATION public.english_nostop ( COPY = pg_catalog.english );
 ALTER TEXT SEARCH CONFIGURATION public.english_nostop
     ALTER MAPPING FOR asciiword, asciihword, hword_asciipart, hword, hword_part, word WITH english_stem_nostop;
+
+-- encrypted sync snapshots; also created by the server on startup (go/api/vault)
+create table if not exists public.sync_vaults
+(
+    id_hash    bytea primary key,
+    version    bigint not null,
+    data       bytea  not null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);

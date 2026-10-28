@@ -32,9 +32,7 @@
                     <ReadingSettings v-if="showReadingSettings" @close="showReadingSettings = false" />
                 </Transition>
                 <Transition name="fade">
-                    <About 
-                        @importData="importData"
-                        v-if="showAbout" @close="showAbout = false" />
+                    <About v-if="showAbout" @close="showAbout = false" />
                 </Transition>
                 <Transition name="fade">
                     <History v-if="showHistory" @close="showHistory = false"
@@ -231,13 +229,15 @@ import dayjs from 'dayjs'
 import { onMounted, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
+import { useUserDataStore } from '@/stores/userDataStore.js'
 import http from '@/http'
 import { mobileCheck } from '@/assets/js/mobileDetect.js'
-import { normalizePlans, passageLocation } from '@/assets/js/plans.js'
+import { passageLocation } from '@/assets/js/plans.js'
 import { BOOKS_BY_ID } from '@/assets/js/books.js'
 
 const baseUrl = useBaseUrlStore()
 const store = useAppStore()
+const userData = useUserDataStore()
 
 const showReadingSettings = ref(false)
 const showAbout = ref(false)
@@ -253,11 +253,11 @@ const showVersePicker = ref(false)
 const showSearch = ref(false)
 const presentedVerses = ref([])
 const selectedVerses = ref([])
-const highlightedVerses = ref([])
-const plans = ref([])
+const highlightedVerses = computed(() => userData.highlights)
+const plans = computed(() => userData.plans)
 // { planId, day } of the plan day being read, set when a passage is opened from Plans
 const readingPlanContext = ref(null)
-const history = ref([])
+const history = computed(() => userData.history)
 const lastLocation = ref({})
 
 const prevChapter = ref({})
@@ -293,26 +293,12 @@ const sortedSelectedVerses = computed(() => {
     return selectedVerses.value.sort((a, b) => a - b)
 })
 
-const savePlans = () => {
-    localStorage.setItem('plans', JSON.stringify(plans.value))
-}
-
-const loadPlans = () => {
-    const stored = JSON.parse(localStorage.getItem('plans'))
-    plans.value = normalizePlans(stored)
-    if (stored) {
-        // persist ids given to plans saved by older versions
-        savePlans()
-    }
-}
-
 const findPlanDay = (planId, day) => {
     return plans.value.find(p => p.id === planId)?.days.find(d => d.day === day)
 }
 
 const startPlan = (plan) => {
-    plans.value.push(plan)
-    savePlans()
+    userData.addPlan(plan)
 }
 
 const togglePassage = ({ planId, day, index }) => {
@@ -320,15 +306,22 @@ const togglePassage = ({ planId, day, index }) => {
     if (!passage) {
         return
     }
-    passage.completedOn = passage.completedOn ? null : new Date().toISOString()
-    savePlans()
+    userData.setPassagesCompleted(planId, [{ day, index, completedOn: passage.completedOn ? null : new Date().toISOString() }])
 }
 
 const setDayComplete = ({ planId, day, complete }) => {
-    findPlanDay(planId, day)?.passages.forEach(p => {
-        p.completedOn = complete ? (p.completedOn || new Date().toISOString()) : null
-    })
-    savePlans()
+    const passages = findPlanDay(planId, day)?.passages ?? []
+    userData.setPassagesCompleted(planId, passages
+        // leave already-read passages with the day they were read
+        .map((p, index) => ({ day, index, completedOn: complete ? (p.completedOn || new Date().toISOString()) : null }))
+        .filter((p, index) => p.completedOn !== passages[index].completedOn))
+}
+
+const markCurrentPlanPassageRead = () => {
+    const { plan, day, index, passage } = planReading.value
+    if (passage && !passage.completedOn) {
+        userData.setPassagesCompleted(plan.id, [{ day: day.day, index, completedOn: new Date().toISOString() }])
+    }
 }
 
 const goToPassage = (passage) => {
@@ -381,29 +374,16 @@ const toggleCurrentPlanPassage = () => {
 }
 
 const goToNextPlanPassage = () => {
-    const { passage, next } = planReading.value
-    if (passage && !passage.completedOn) {
-        passage.completedOn = new Date().toISOString()
-        savePlans()
-    }
+    const { next } = planReading.value
+    markCurrentPlanPassageRead()
     goToPassage(next)
 }
 
 const finishPlanDay = () => {
-    const { passage } = planReading.value
-    if (!passage.completedOn) {
-        passage.completedOn = new Date().toISOString()
-        savePlans()
-    }
+    markCurrentPlanPassageRead()
     showPlans.value = true
 }
 
-const importData = () => {
-    // refresh hisotry and highlights from local storage
-    highlightedVerses.value = JSON.parse(localStorage.getItem('highlightedVerses')) || []
-    history.value = JSON.parse(localStorage.getItem('history')) || []
-    loadPlans()
-}
 // on Ctrl + C do a rich copy
 window.addEventListener('keydown', function(e) {
     if (e.key === 'c' && e.ctrlKey) {
@@ -497,34 +477,31 @@ const updateHistory = (verse) => {
         return
     }
 
-    history.value.unshift({
+    userData.addHistory({
         bookId: parseInt(bookId.value),
         book: book.value,
         chapter: chapter.value,
         timestamp: new Date().toISOString(),
         verse: verse
     })
-    // save history to local storage
-    localStorage.setItem('history', JSON.stringify(history.value.slice(0, 100)))
 }
 
-const findHighlightedVerse = (verseId) => {
-    let highlight = highlightedVerses.value.find(v => v.verseId === verseId)
-    return highlight ? highlight.color : ''
-}
+const findHighlightedVerse = (verseId) => userData.highlightColor(verseId)
 
 const highlightSelectedVerses = (color) => {
-    if (!color) {
-        highlightedVerses.value = highlightedVerses.value.filter(v => !selectedVerses.value.includes(v.verseId))
-        selectedVerses.value = []
-        return
-    }
+    const changes = {}
     selectedVerses.value.forEach(verseId => {
-        highlightedVerses.value = highlightedVerses.value.filter(v => v.verseId !== verseId)
+        if (!color) {
+            // only clear highlights that exist, so nothing is written for plain verses
+            if (findHighlightedVerse(verseId)) {
+                changes[verseId] = null
+            }
+            return
+        }
 
         var verseData =  verses.value.find(v => v.ID === verseId)
 
-        highlightedVerses.value.unshift({
+        changes[verseId] = {
             verseId: verseId,
             color: color,
             book: verseData.B,
@@ -532,11 +509,10 @@ const highlightSelectedVerses = (color) => {
             timestamp: new Date().toISOString(),
             chapter: verseData.C,
             verse: parseInt(String(verseId).slice(-3)),
-        })
+        }
     })
     selectedVerses.value = []
-    // save highlighted verses to local storage
-    localStorage.setItem('highlightedVerses', JSON.stringify(highlightedVerses.value))
+    userData.setHighlights(changes)
 }
 
 const selectVerse = (verseId) => {
@@ -591,11 +567,10 @@ const plansClosed = () => {
 }
 
 const deletePlan = (planId) => {
-    plans.value = plans.value.filter(p => p.id !== planId)
+    userData.deletePlan(planId)
     if (readingPlanContext.value?.planId === planId) {
         readingPlanContext.value = null
     }
-    savePlans()
 }
 
 const versePickerClosed = () => {
@@ -683,14 +658,8 @@ const getVerses = async (verseId) => {
 }
 
 onMounted(async () => {
-    // get highlighted verses from local storage
-    highlightedVerses.value = JSON.parse(localStorage.getItem('highlightedVerses')) || []
-    // get history from local storage
-    history.value = JSON.parse(localStorage.getItem('history')) || []
     // get last location from local storage
     lastLocation.value = JSON.parse(localStorage.getItem('lastLocation')) || {}
-
-    loadPlans()
 
     if (lastLocation.value.bookId && lastLocation.value.chapter) {
         bookId.value = lastLocation.value.bookId

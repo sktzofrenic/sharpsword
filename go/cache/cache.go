@@ -21,6 +21,9 @@ func Policy(path string) string {
     switch {
     case strings.HasPrefix(path, "/assets/"):
         return Immutable
+    // each user's sync data changes constantly and must never be shared
+    case strings.HasPrefix(path, "/api/v1/sync"):
+        return NoStore
     case strings.HasPrefix(path, "/api/") && strings.HasSuffix(path, "/search"):
         return Search
     case strings.HasPrefix(path, "/api/"):

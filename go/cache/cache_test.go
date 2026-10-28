@@ -17,6 +17,8 @@ func TestPolicy(t *testing.T) {
         "/api/v1/bible/kjv":                BibleText,
         "/api/v1/bible/kjv/43/3":           BibleText,
         "/api/v1/bible/kjv/search":         Search,
+        "/api/v1/sync":                     NoStore,
+        "/api/v1/sync/":                    NoStore,
     }
 
     for path, want := range cases {

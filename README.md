@@ -120,6 +120,18 @@ The Go server sets `Cache-Control` headers for every response (`go/cache`):
 - **`/assets/*`:** cached for a year, because the file names change with every build.
 - **Bible text from the API:** cached for a day.
 - **`index.html`, `sw.js` and the manifest:** checked on every load, so deploys show up right away.
+- **`/api/v1/sync`:** never cached.
+
+### Sync & Backup
+
+Readers can back up their plans, highlights and history, and sync them between devices, from the About panel. There are no accounts; everything is tied to a sync key.
+
+- **Encrypted in the browser:** the key is stretched with PBKDF2 into a vault id and an AES-GCM key (`src/assets/js/sync.js`). The server only sees the vault id, stores a hash of it, and keeps the encrypted snapshot. It can't read the data, and a lost key can't be recovered.
+- **Records:** the data is stored as small timestamped records in localStorage (`src/assets/js/records.js`), and the newest copy of each record wins. Concurrent changes on different devices merge, and open tabs sync instantly through the `storage` event. `src/stores/userDataStore.js` turns the records back into the arrays the components use, and moves data saved by older versions over on first load, keeping the original under `ss.legacy-backup`.
+- **Syncing:** `src/stores/syncStore.js` syncs 2 seconds after a change, when the app regains focus or comes back online, and every minute while it is visible. A save sends the version it was based on. If another device saved first, the server returns its copy to merge before retrying.
+- **Server:** `go/api/vault` serves `GET`, `PUT` and `DELETE` on `/api/v1/sync`, with the vault id in the `X-Sync-Vault` header. Requests are rate-limited per vault and snapshots are capped at 1 MB. It creates its `sync_vaults` table on startup. If the database user isn't allowed to create tables, run the `CREATE TABLE` statement from `go/api/vault/vault.go` once by hand.
+
+Font size, line height and last location stay per device.
 
 ## Tests
 
