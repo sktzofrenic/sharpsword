@@ -864,6 +864,10 @@ select {
   z-index: 20;
 }
 
+.z-\[1\] {
+  z-index: 1;
+}
+
 .-mx-4 {
   margin-left: -1rem;
   margin-right: -1rem;
@@ -1040,6 +1044,10 @@ select {
 
 .max-h-\[60vh\] {
   max-height: 60vh;
+}
+
+.max-h-\[calc\(100dvh-6rem\)\] {
+  max-height: calc(100dvh - 6rem);
 }
 
 .min-h-full {
@@ -1219,6 +1227,10 @@ select {
 
 .overflow-x-hidden {
   overflow-x: hidden;
+}
+
+.overscroll-contain {
+  overscroll-behavior: contain;
 }
 
 .truncate {
@@ -1979,6 +1991,10 @@ select {
 
   .sm\:w-\[20vw\] {
     width: 20vw;
+  }
+
+  .sm\:w-\[26rem\] {
+    width: 26rem;
   }
 
   .sm\:w-auto {

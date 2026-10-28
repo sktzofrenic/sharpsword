@@ -1,6 +1,7 @@
 <template>
-    <div class="absolute z-10 w-[90vw] right-6 sm:w-[20vw] top-20">
-        <div class="px-4 py-2 bg-slate-800 border-b border-slate-600 rounded-lg shadow-slate-900 shadow-xl">
+    <div class="absolute z-10 w-[90vw] right-6 sm:w-[26rem] top-20">
+        <!-- scroll inside the panel when it is taller than the screen -->
+        <div class="px-4 py-2 bg-slate-800 border-b border-slate-600 rounded-lg shadow-slate-900 shadow-xl max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain">
             <h3 class="font-semibold text-slate-400 pt-2">About this App</h3>
             <div class="absolute right-0 top-0 pr-4 pt-4">
                 <button type="button" class="rounded-md  text-slate-400 hover:text-gray-500" @click="close">

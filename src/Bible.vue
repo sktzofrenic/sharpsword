@@ -25,7 +25,8 @@
             @deletePlan="deletePlan"/>
     </Transition>
     <div class="min-h-full">
-        <nav class="bg-slate-950/30 sticky top-0 backdrop-blur-sm">
+        <!-- z-[1] keeps the bar above verses (positioned for their glow) but below z-10 modals -->
+        <nav class="bg-slate-950/30 sticky top-0 z-[1] backdrop-blur-sm">
             <div class="mx-auto max-w-7xl pr-4 relative">
                 <Transition name="fade">
                     <ReadingSettings v-if="showReadingSettings" @close="showReadingSettings = false" />
