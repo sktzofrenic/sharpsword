@@ -12,6 +12,38 @@ export const PLAN_CATALOG = [
         length: 365,
         load: () => import('@/assets/plans/as-it-happened.json'),
     },
+    {
+        slug: 'psalms',
+        title: 'Psalms',
+        description: 'Read all 150 psalms in a month, about five a day.',
+        attribution: 'Reading order from the "Psalms" plan by BiblePlans.org.',
+        length: 31,
+        load: () => import('@/assets/plans/psalms.json'),
+    },
+    {
+        slug: 'proverbs',
+        title: 'Read Through Proverbs',
+        description: 'Read one chapter of Proverbs a day for a month.',
+        attribution: 'Reading order from the "Read Through Proverbs" plan by Marketing with Wisdom, Inc.',
+        length: 31,
+        load: () => import('@/assets/plans/proverbs.json'),
+    },
+    {
+        slug: 'new-testament-90',
+        title: 'The New Testament in 90 Days',
+        description: 'Read all 260 chapters of the New Testament, Matthew to Revelation, in 90 days.',
+        attribution: 'Reading order from "The New Testament in 90 Days" plan by YouVersion.',
+        length: 90,
+        load: () => import('@/assets/plans/new-testament-90.json'),
+    },
+    {
+        slug: 'old-testament-90',
+        title: 'The Old Testament in 90 Days',
+        description: 'Read the Old Testament, Genesis to Malachi, in 90 days, about 10 to 12 chapters a day.',
+        attribution: 'Reading order from the "OT90 (Old Testament in 90 Days)" plan by Rico Smith Ministries, Inc.',
+        length: 90,
+        load: () => import('@/assets/plans/old-testament-90.json'),
+    },
 ]
 
 const DATE_FORMAT = 'YYYY-MM-DD'
