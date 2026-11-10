@@ -78,7 +78,28 @@
                 @touchmove="onSwipeMove"
                 @touchend="onSwipeEnd"
                 @touchcancel="onSwipeCancel">
-              <div ref="swipeContent" :style="swipeStyle">
+              <div class="relative" :style="swipeStyle">
+                <!-- the chapter being swiped to, one screen width to the side, level with the top of the screen -->
+                <div v-if="swipePreview" class="absolute overflow-hidden pointer-events-none" aria-hidden="true"
+                    :style="{ top: `${swipePreview.top}px`, left: `${swipePreview.left}px`, right: `${-swipePreview.left}px`, height: '100vh' }">
+                    <div class="w-full flex flex-col justify-center items-center">
+                        <div class="text-md font-semi-bold">
+                            {{ swipePreview.book }}
+                        </div>
+                        <div class="font-bold text-6xl mb-8">
+                            {{ swipePreview.chapter }}
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center leading-loose text-lg max-w-lg mx-auto">
+                        <Verse v-for="(verse, index) in swipePreview.verses"
+                            :key="verse.ID"
+                            :fontSize="store.fontSize"
+                            :lineHeight="store.lineHeight"
+                            :highlighted="findHighlightedVerse(verse.ID)"
+                            :verse="verse"
+                            :index=index />
+                    </div>
+                </div>
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
                         {{ book }}
@@ -592,25 +613,48 @@ const changeChapter = (reference) => {
 }
 
 // Swiping left or right across the text goes to the next or previous chapter.
-// The text follows the finger, slides out, and the new chapter slides in from the other side.
-const swipeContent = ref(null)
+// Like turning a page: the text follows the finger with the neighbouring chapter
+// right beside it, which slides into place and becomes the open chapter.
 const swipeOffset = ref(0)
 const swipeTransition = ref('none')
+// scroll position and width when the swipe started, which place the neighbouring chapter
+const swipeFrame = ref({ top: 0, width: 0 })
 let swipe = null
 let swipeBusy = false
 
 const swipeStyle = computed(() => ({
     transform: swipeOffset.value ? `translate3d(${swipeOffset.value}px, 0, 0)` : 'none',
-    opacity: swipeOffset.value ? 1 - Math.min(Math.abs(swipeOffset.value) / (versesContainer.value?.clientWidth || 1), 1) * 0.6 : 1,
     transition: swipeTransition.value,
 }))
+
+// what to draw beside the text while it is dragged: the next chapter to the right, the previous to the left
+const swipePreview = computed(() => {
+    if (!swipeOffset.value) {
+        return null
+    }
+    const direction = swipeOffset.value < 0 ? 1 : -1
+    const target = direction > 0 ? nextChapter.value : prevChapter.value
+    if (!hasChapter(target)) {
+        return null
+    }
+    cachedChapters.value // re-run when a chapter finishes loading mid-swipe
+    const loaded = chapterCache.get(chapterKey(target.bookId, target.chapter))
+    return {
+        top: swipeFrame.value.top,
+        left: direction * swipeFrame.value.width,
+        book: loaded?.verses[0].B ?? BOOKS_BY_ID[target.bookId]?.name,
+        chapter: target.chapter,
+        // enough to fill the screen
+        verses: loaded ? loaded.verses.slice(0, 40) : [],
+    }
+})
 
 // Genesis 1 and Revelation 22 point at themselves as previous and next
 const hasChapter = (target) => Boolean(target?.bookId)
     && !(Number(target.bookId) === Number(bookId.value) && Number(target.chapter) === Number(chapter.value))
 
 const animateSwipe = (offset, ms) => new Promise(resolve => {
-    swipeTransition.value = ms ? `transform ${ms}ms ease-out, opacity ${ms}ms ease-out` : 'none'
+    swipeTransition.value = ms ? `transform ${ms}ms ease-out` : 'none'
     swipeOffset.value = offset
     setTimeout(resolve, ms)
 })
@@ -641,6 +685,7 @@ const onSwipeMove = (e) => {
         swipe.axis = !selecting && Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y'
         if (swipe.axis === 'x') {
             swipeTransition.value = 'none'
+            swipeFrame.value = { top: versesContainer.value.scrollTop, width: versesContainer.value.clientWidth }
         }
     }
     if (swipe.axis !== 'x') {
@@ -661,7 +706,7 @@ const onSwipeEnd = async (e) => {
     if (!s || s.axis !== 'x') {
         return
     }
-    const width = versesContainer.value.clientWidth
+    const width = swipeFrame.value.width
     const velocity = s.dx / Math.max(e.timeStamp - s.time, 1)
     const target = s.dx < 0 ? nextChapter.value : prevChapter.value
     const farEnough = Math.abs(s.dx) > width * 0.25 || (Math.abs(s.dx) > 40 && Math.abs(velocity) > 0.4)
@@ -675,14 +720,13 @@ const onSwipeEnd = async (e) => {
     const direction = Math.sign(s.dx)
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     try {
-        await animateSwipe(direction * width, reduceMotion ? 0 : 180)
+        // the neighbouring chapter is now where the text was
+        await animateSwipe(direction * width, reduceMotion ? 0 : 220)
+        // usually already loaded, so it swaps in before the next frame and the switch can't be seen
         const loaded = await changeChapter(target)
-        // a new chapter comes in from the opposite side, a failed load slides back
-        await animateSwipe(loaded ? -direction * width : direction * width, 0)
-        await nextTick()
-        // apply the starting position before animating from it
-        void swipeContent.value?.offsetWidth
-        await animateSwipe(0, reduceMotion ? 0 : 220)
+        if (!loaded) {
+            await animateSwipe(0, reduceMotion ? 0 : 220)
+        }
     } finally {
         swipeTransition.value = 'none'
         swipeOffset.value = 0
@@ -704,37 +748,70 @@ const scrollToVerse = (verseId) => {
     }
 }
 
+// Chapters read this session, plus the ones on either side of the open chapter,
+// so a swipe can show the neighbouring chapter and switch to it without waiting.
+const chapterCache = new Map()
+const CHAPTER_CACHE_SIZE = 12
+// counts chapters added, so views of the cache update
+const cachedChapters = ref(0)
+
+const chapterKey = (bookId, chapter) => `${Number(bookId)}/${Number(chapter)}`
+
+// { verses, prev, next } for a chapter, or null when the API has no verses for it
+const fetchChapter = async (bookId, chapter) => {
+    const key = chapterKey(bookId, chapter)
+    if (chapterCache.has(key)) {
+        return chapterCache.get(key)
+    }
+    const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/${bookId}/${chapter}`)
+    const v = response.data.v
+    if (!v || v.length === 0) {
+        return null
+    }
+
+    // the API adds the verse before and the verse after the chapter, which point at its neighbours
+    const first = v[0]
+    const last = v[v.length - 1]
+    const start = (first.BID === v[1]?.BID && first.C === v[1]?.C) ? 0 : 1
+    const end = (last.BID === v[v.length - 2]?.BID && last.C === v[v.length - 2]?.C) ? v.length : v.length - 1
+    const parsed = {
+        verses: v.slice(start, end),
+        prev: { bookId: first.BID, chapter: first.C },
+        next: { bookId: last.BID, chapter: last.C },
+    }
+
+    chapterCache.delete(key)
+    chapterCache.set(key, parsed)
+    if (chapterCache.size > CHAPTER_CACHE_SIZE) {
+        chapterCache.delete(chapterCache.keys().next().value)
+    }
+    cachedChapters.value++
+    return parsed
+}
+
+const prefetchChapter = (target) => {
+    if (hasChapter(target)) {
+        fetchChapter(target.bookId, target.chapter).catch(() => {})
+    }
+}
+
 // resolves true once the chapter is on screen
 const getVerses = async (verseId) => {
     presentedVerses.value = []
     try {
-        const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/${bookId.value}/${chapter.value}`)
-        if (response.data.v === null || response.data.v.length === 0) {
+        const loaded = await fetchChapter(bookId.value, chapter.value)
+        if (!loaded) {
             return false
         }
 
-        var prev = response.data.v[0]
-        prevChapter.value = {
-            bookId: prev.BID,
-            chapter: prev.C
-        }
-        var next = response.data.v[response.data.v.length - 1]
-        nextChapter.value = {
-            bookId: next.BID,
-            chapter: next.C
-        }
-
-        if (!((response.data.v[0].BID === response.data.v[1].BID) && (response.data.v[0].C === response.data.v[1].C))) {
-            response.data.v.shift()
-        } 
-        if (!((response.data.v[response.data.v.length - 1].BID === response.data.v[response.data.v.length - 2].BID) && (response.data.v[response.data.v.length - 1].C === response.data.v[response.data.v.length - 2].C))) {
-            response.data.v.pop()
-        }
-
-        verses.value = response.data.v
-        bookId.value = response.data.v[0].BID
-        book.value = response.data.v[0].B
-        chapter.value = response.data.v[0].C
+        prevChapter.value = loaded.prev
+        nextChapter.value = loaded.next
+        verses.value = loaded.verses
+        bookId.value = loaded.verses[0].BID
+        book.value = loaded.verses[0].B
+        chapter.value = loaded.verses[0].C
+        prefetchChapter(loaded.prev)
+        prefetchChapter(loaded.next)
         // scroll to top of verses container
         versesContainer.value.scrollTop = 0
         updateLastLocation({
