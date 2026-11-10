@@ -98,7 +98,7 @@ Styles come from the committed `src/assets/output.css`. After using Tailwind cla
 
 Plans that ship with the app are listed in `PLAN_CATALOG` in `src/assets/js/plans.js`. Each one points to a JSON file in `src/assets/plans/` that holds one array of USFM references per day, for example `["GEN.1", "PSA.119.1-88"]`. When someone starts a plan, a copy with their start date and progress is saved in `localStorage`.
 
-To add a plan, put its JSON file in `src/assets/plans/`, add an entry to `PLAN_CATALOG`, and run `npm run validate:plans`. This checks that every reference is valid and that the plan covers every chapter.
+To add a plan, put its JSON file in `src/assets/plans/`, add an entry to `PLAN_CATALOG`, and run `npm run validate:plans`. This checks that every reference is valid and that the plan reads every chapter it covers. A plan covers the whole Bible unless its JSON has a `covers` field naming a book or range of books, like `"PSA"` or `"MAT-REV"`.
 
 ## Production Build
 
