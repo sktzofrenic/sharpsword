@@ -72,7 +72,13 @@
         </nav>
         <main>
             <!-- overflow-x-hidden: nothing here should ever scroll sideways, e.g. the verse glow on phones -->
-            <div  class="mx-auto max-w-7xl px-6  text-slate-100 -mt-10 pt-20 overflow-x-hidden" :class="planReading ? 'pb-56' : 'pb-40'" style="height: 100vh; overflow-y: auto" ref="versesContainer">
+            <!-- touch-action: the browser keeps vertical scrolling and pinch zoom, horizontal swipes change chapter -->
+            <div  class="mx-auto max-w-7xl px-6  text-slate-100 -mt-10 pt-20 overflow-x-hidden" :class="planReading ? 'pb-56' : 'pb-40'" style="height: 100vh; overflow-y: auto; touch-action: pan-y pinch-zoom" ref="versesContainer"
+                @touchstart.passive="onSwipeStart"
+                @touchmove="onSwipeMove"
+                @touchend="onSwipeEnd"
+                @touchcancel="onSwipeCancel">
+              <div ref="swipeContent" :style="swipeStyle">
                 <div class="w-full flex flex-col justify-center items-center">
                     <div class="text-md font-semi-bold">
                         {{ book }}
@@ -98,7 +104,7 @@
                         </button>
                     </div>
                 </div>
-
+              </div>
             </div>
         </main>
         <footer class="bg-slate-950 fixed w-full bottom-0 border-slate-600 border-t">
@@ -581,8 +587,114 @@ const versePickerClosed = () => {
 const changeChapter = (reference) => {
     bookId.value = reference.bookId
     chapter.value = reference.chapter
-    getVerses()
     showHistory.value = false
+    return getVerses()
+}
+
+// Swiping left or right across the text goes to the next or previous chapter.
+// The text follows the finger, slides out, and the new chapter slides in from the other side.
+const swipeContent = ref(null)
+const swipeOffset = ref(0)
+const swipeTransition = ref('none')
+let swipe = null
+let swipeBusy = false
+
+const swipeStyle = computed(() => ({
+    transform: swipeOffset.value ? `translate3d(${swipeOffset.value}px, 0, 0)` : 'none',
+    opacity: swipeOffset.value ? 1 - Math.min(Math.abs(swipeOffset.value) / (versesContainer.value?.clientWidth || 1), 1) * 0.6 : 1,
+    transition: swipeTransition.value,
+}))
+
+// Genesis 1 and Revelation 22 point at themselves as previous and next
+const hasChapter = (target) => Boolean(target?.bookId)
+    && !(Number(target.bookId) === Number(bookId.value) && Number(target.chapter) === Number(chapter.value))
+
+const animateSwipe = (offset, ms) => new Promise(resolve => {
+    swipeTransition.value = ms ? `transform ${ms}ms ease-out, opacity ${ms}ms ease-out` : 'none'
+    swipeOffset.value = offset
+    setTimeout(resolve, ms)
+})
+
+const onSwipeStart = (e) => {
+    if (swipeBusy || e.touches.length !== 1) {
+        swipe = null
+        return
+    }
+    const touch = e.touches[0]
+    swipe = { x: touch.clientX, y: touch.clientY, time: e.timeStamp, dx: 0, axis: null }
+}
+
+const onSwipeMove = (e) => {
+    if (!swipe || e.touches.length !== 1) {
+        return
+    }
+    const touch = e.touches[0]
+    const dx = touch.clientX - swipe.x
+    const dy = touch.clientY - swipe.y
+
+    if (!swipe.axis) {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+            return
+        }
+        // a selection handle being dragged is not a swipe
+        const selecting = !(window.getSelection()?.isCollapsed ?? true)
+        swipe.axis = !selecting && Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y'
+        if (swipe.axis === 'x') {
+            swipeTransition.value = 'none'
+        }
+    }
+    if (swipe.axis !== 'x') {
+        return
+    }
+    if (e.cancelable) {
+        e.preventDefault()
+    }
+    swipe.dx = dx
+    const target = dx < 0 ? nextChapter.value : prevChapter.value
+    // resist when there is no chapter that way
+    swipeOffset.value = hasChapter(target) ? dx : dx / 4
+}
+
+const onSwipeEnd = async (e) => {
+    const s = swipe
+    swipe = null
+    if (!s || s.axis !== 'x') {
+        return
+    }
+    const width = versesContainer.value.clientWidth
+    const velocity = s.dx / Math.max(e.timeStamp - s.time, 1)
+    const target = s.dx < 0 ? nextChapter.value : prevChapter.value
+    const farEnough = Math.abs(s.dx) > width * 0.25 || (Math.abs(s.dx) > 40 && Math.abs(velocity) > 0.4)
+
+    if (!farEnough || !hasChapter(target)) {
+        animateSwipe(0, 200)
+        return
+    }
+
+    swipeBusy = true
+    const direction = Math.sign(s.dx)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    try {
+        await animateSwipe(direction * width, reduceMotion ? 0 : 180)
+        const loaded = await changeChapter(target)
+        // a new chapter comes in from the opposite side, a failed load slides back
+        await animateSwipe(loaded ? -direction * width : direction * width, 0)
+        await nextTick()
+        // apply the starting position before animating from it
+        void swipeContent.value?.offsetWidth
+        await animateSwipe(0, reduceMotion ? 0 : 220)
+    } finally {
+        swipeTransition.value = 'none'
+        swipeOffset.value = 0
+        swipeBusy = false
+    }
+}
+
+const onSwipeCancel = () => {
+    swipe = null
+    if (!swipeBusy && swipeOffset.value) {
+        animateSwipe(0, 200)
+    }
 }
 
 const scrollToVerse = (verseId) => {
@@ -592,12 +704,13 @@ const scrollToVerse = (verseId) => {
     }
 }
 
+// resolves true once the chapter is on screen
 const getVerses = async (verseId) => {
     presentedVerses.value = []
     try {
         const response = await http.get(`${baseUrl.baseUrl}/api/v1/bible/kjv/${bookId.value}/${chapter.value}`)
         if (response.data.v === null || response.data.v.length === 0) {
-            return
+            return false
         }
 
         var prev = response.data.v[0]
@@ -642,7 +755,7 @@ const getVerses = async (verseId) => {
         setTimeout(() => {
             presentedVerses.value = []
         }, 5000)
-
+        return true
     } catch (error) {
         console.error(error)
         const requested = `${BOOKS_BY_ID[bookId.value]?.name ?? ''} ${chapter.value}`.trim()
@@ -655,6 +768,7 @@ const getVerses = async (verseId) => {
         showLoadError(error.response
             ? `Couldn't load ${requested}. Please try again.`
             : `${requested} isn't available offline yet.`)
+        return false
     }
 }
 
