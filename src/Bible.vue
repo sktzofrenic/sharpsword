@@ -1,9 +1,9 @@
 <template>
     <UpdatePrompt />
     <Transition name="fade">
-        <div class="fixed top-20 inset-x-0 z-20 flex justify-center px-4 pointer-events-none" v-if="loadError" role="alert">
+        <div class="fixed top-20 inset-x-0 z-20 flex justify-center px-4 pointer-events-none" v-if="toastMessage" role="alert">
             <div class="rounded-2xl bg-slate-800 ring-1 ring-inset ring-slate-700 shadow-lg shadow-black px-4 py-3 text-sm text-slate-100">
-                {{ loadError }}
+                {{ toastMessage }}
             </div>
         </div>
     </Transition>
@@ -159,7 +159,7 @@
                             <i class="fa-solid fa-highlighter-line"></i>
                         </button>
                         <button class="px-2 text-gray-200 bg-slate-900 rounded-lg py-1" 
-                            @click="richCopy">
+                            @click="copySelectedVerses()">
                             <i class="fa-regular fa-copy"></i>
                         </button>
                     </div>
@@ -254,7 +254,7 @@ import Search from '@/components/Search.vue'
 import About from '@/components/About.vue'
 import UpdatePrompt from '@/components/UpdatePrompt.vue'
 import dayjs from 'dayjs'
-import { onMounted, ref, computed, nextTick} from 'vue'
+import { onMounted, onBeforeUnmount, ref, computed, nextTick} from 'vue'
 import { useBaseUrlStore } from '@/stores/baseUrlStore.js'
 import { useAppStore } from '@/stores/appStore.js'
 import { useUserDataStore } from '@/stores/userDataStore.js'
@@ -291,30 +291,16 @@ const lastLocation = ref({})
 const prevChapter = ref({})
 const nextChapter = ref({})
 const reference = ref('')
-const loadError = ref('')
-let loadErrorTimer = null
+const toastMessage = ref('')
+let toastTimer = null
 
-const showLoadError = (message) => {
-    loadError.value = message
-    clearTimeout(loadErrorTimer)
-    loadErrorTimer = setTimeout(() => {
-        loadError.value = ''
-    }, 4000)
+const showToast = (message, duration = 4000) => {
+    toastMessage.value = message
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => {
+        toastMessage.value = ''
+    }, duration)
 }
-
-// on left and right arrow key press, change chapter
-window.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowLeft') {
-        changeChapter(prevChapter.value)
-    }
-})
-window.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowRight') {
-        changeChapter(nextChapter.value)
-    }
-})
-
-
 
 //computed sorted selected verses
 const sortedSelectedVerses = computed(() => {
@@ -412,78 +398,108 @@ const finishPlanDay = () => {
     showPlans.value = true
 }
 
-// on Ctrl + C do a rich copy
-window.addEventListener('keydown', function(e) {
-    if (e.key === 'c' && e.ctrlKey) {
-        e.preventDefault()
-        richCopy()
-    }
-})
-//
-// on Ctrl + C do a rich copy
-window.addEventListener('keydown', function(e) {
-    if (e.key === 'p' && e.ctrlKey) {
-        e.preventDefault()
-        richCopy({ plainText: true })
-    }
-})
+// builds the copied passage as rich html and as plain text
+const buildCopyContent = () => {
+    // get first and last verse from selection and build reference
+    let firstVerse = verses.value.find(v => v.ID === sortedSelectedVerses.value[0])
+    let lastVerse = verses.value.find(v => v.ID === sortedSelectedVerses.value[sortedSelectedVerses.value.length - 1])
+    let firstVerseRef = `${firstVerse.B} ${firstVerse.C}:${parseInt(String(firstVerse.ID).slice(-3))}`
+    let lastVerseRef = `${lastVerse.B} ${lastVerse.C}:${parseInt(String(lastVerse.ID).slice(-3))}`
+    let trimmed = `${lastVerse.B === firstVerse.B ? '' : lastVerse.B} ${lastVerse.C === firstVerse.C ? '' : lastVerse.C + ':'}${parseInt(String(lastVerse.ID).slice(-3))}`
+    let reference = firstVerseRef === lastVerseRef ? firstVerseRef : `${firstVerseRef}-${trimmed.trim()}`
 
+    let content = sortedSelectedVerses.value.map((verseId, index) => {
+        let verse = verses.value.find(v => v.ID === verseId)
 
+        let verseNumber = parseInt(String(verse.ID).slice(-3))
 
-const richCopy = (options) => {
-    try {
-        // get first and last verse from selection and build reference
-        let firstVerse = verses.value.find(v => v.ID === sortedSelectedVerses.value[0])
-        let lastVerse = verses.value.find(v => v.ID === sortedSelectedVerses.value[sortedSelectedVerses.value.length - 1])
-        let firstVerseRef = `${firstVerse.B} ${firstVerse.C}:${parseInt(String(firstVerse.ID).slice(-3))}`
-        let lastVerseRef = `${lastVerse.B} ${lastVerse.C}:${parseInt(String(lastVerse.ID).slice(-3))}`
-        let trimmed = `${lastVerse.B === firstVerse.B ? '' : lastVerse.B} ${lastVerse.C === firstVerse.C ? '' : lastVerse.C + ':'}${parseInt(String(lastVerse.ID).slice(-3))}`
-
-        let content = sortedSelectedVerses.value.map((verseId, index) => {
-            let verse = verses.value.find(v => v.ID === verseId)
-
-            let verseNumber = parseInt(String(verse.ID).slice(-3))
-
-            if (sortedSelectedVerses.value.length === 1 || index === 0) {
-                verseNumber = ``
-            } else {
-                verseNumber = `<b> v${verseNumber} </b>`
-            }
-            return `<span>${verseNumber} ${verse.T}</span>`
-
-        }).join('')
-
-        if (firstVerseRef === lastVerseRef) {
-            content = `<span><b>${firstVerseRef} </b></span>` + content
+        if (sortedSelectedVerses.value.length === 1 || index === 0) {
+            verseNumber = ``
         } else {
-            content = `<span><b>${firstVerseRef}-${trimmed.trim()} </b></span>` + content
+            verseNumber = `<b> v${verseNumber} </b>`
         }
+        return `<span>${verseNumber} ${verse.T}</span>`
 
-        // remove span tag with label class including closing tag and content
-        content = content.replace(/<span class="label">.*?<\/span>/gm, '')
+    }).join('')
 
-        if ((options && options.plainText) || mobileCheck()) {
+    content = `<span><b>${reference} </b></span>` + content
 
-            // strip out all html tags from content
-            content = content.replace(/<[^>]*>?/gm, '')
-            navigator.clipboard.writeText(content)
-            return
+    // remove span tag with label class including closing tag and content
+    content = content.replace(/<span class="label">.*?<\/span>/gm, '')
+
+    const plain = (new DOMParser().parseFromString(content, 'text/html').body.textContent || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+
+    const html = content + `<style>
+        .add {
+            font-style: italic;
         }
+        .wj {
+            color: #e17777;
+        }
+        </style>`
 
-        content += `<style>
-            .add {
-                font-style: italic;
-            }
-            .wj {
-                color: #e17777;
-            }
-            </style>`
-        const blobInput = new Blob([content], {type: 'text/html'});
-        const clipboardItemInput = new ClipboardItem({'text/html' : blobInput});
-        navigator.clipboard.write([clipboardItemInput]);
-    } catch(e) {
-        // Handle error with user feedback - "Copy failed!" kind of thing
+    return { reference, html, plain }
+}
+
+// copies the selected verses. Desktop gets rich text plus a plain text fallback,
+// so the paste works in both formatted editors and plain text fields
+const copySelectedVerses = async () => {
+    if (selectedVerses.value.length === 0) {
+        return
+    }
+
+    let copied
+    try {
+        copied = buildCopyContent()
+    } catch (e) {
         console.error(e)
+        showToast("Couldn't copy those verses.")
+        return
+    }
+
+    try {
+        if (mobileCheck() || typeof ClipboardItem === 'undefined') {
+            await navigator.clipboard.writeText(copied.plain)
+        } else {
+            await navigator.clipboard.write([new ClipboardItem({
+                'text/html': new Blob([copied.html], { type: 'text/html' }),
+                'text/plain': new Blob([copied.plain], { type: 'text/plain' }),
+            })])
+        }
+        showToast(`Copied ${copied.reference}`, 2000)
+    } catch (e) {
+        console.error(e)
+        showToast("Couldn't copy. Your browser may have blocked clipboard access.")
+    }
+}
+
+const isEditable = (el) => !!el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))
+
+const onKeydown = (e) => {
+    // leave keys alone while typing, e.g. in search
+    if (isEditable(e.target)) {
+        return
+    }
+
+    // on left and right arrow key press, change chapter
+    if (e.key === 'ArrowLeft') {
+        changeChapter(prevChapter.value)
+        return
+    }
+    if (e.key === 'ArrowRight') {
+        changeChapter(nextChapter.value)
+        return
+    }
+
+    // Ctrl + C (Windows/Linux) or Cmd + C (Mac) copies the selected verses,
+    // unless the user has selected some other text to copy
+    const copyKey = e.key.toLowerCase() === 'c' && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey
+    const textSelected = !(window.getSelection()?.isCollapsed ?? true)
+    if (copyKey && selectedVerses.value.length > 0 && !textSelected) {
+        e.preventDefault()
+        copySelectedVerses()
     }
 }
 
@@ -842,7 +858,7 @@ const getVerses = async (verseId) => {
             book.value = verses.value[0].B
             chapter.value = verses.value[0].C
         }
-        showLoadError(error.response
+        showToast(error.response
             ? `Couldn't load ${requested}. Please try again.`
             : `${requested} isn't available offline yet.`)
         return false
@@ -850,6 +866,8 @@ const getVerses = async (verseId) => {
 }
 
 onMounted(async () => {
+    window.addEventListener('keydown', onKeydown)
+
     // get last location from local storage
     lastLocation.value = JSON.parse(localStorage.getItem('lastLocation')) || {}
 
@@ -859,6 +877,11 @@ onMounted(async () => {
     }
 
     getVerses()
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', onKeydown)
+    clearTimeout(toastTimer)
 })
 
 
