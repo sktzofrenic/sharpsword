@@ -100,6 +100,10 @@ export const isDayStarted = (day) => day.passages.some(p => p.completedOn)
 
 export const firstIncompleteDay = (plan) => plan.days.find(d => !isDayComplete(d))?.day ?? null
 
+// The day the reader is actually on: the first one not fully read, or the last day once everything is read.
+// Readers often fall behind, so this can be well before todaysDay.
+export const currentDay = (plan) => firstIncompleteDay(plan) ?? plan.days.at(-1)?.day ?? 1
+
 // How many scheduled days before today are not finished yet.
 export const daysBehind = (plan) => {
     const today = todaysDay(plan)

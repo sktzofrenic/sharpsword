@@ -211,6 +211,7 @@ import {
     PLAN_CATALOG,
     completedDays,
     createPlan,
+    currentDay,
     dayDate,
     daysBehind,
     isDayComplete,
@@ -262,7 +263,7 @@ const scrollToDay = async (day) => {
 
 const openPlan = (plan, day) => {
     activePlanId.value = plan.id
-    activeDayNumber.value = day || todaysDay(plan)
+    activeDayNumber.value = day || currentDay(plan)
     deleteCheckId.value = null
     scrollToDay(activeDayNumber.value)
 }
